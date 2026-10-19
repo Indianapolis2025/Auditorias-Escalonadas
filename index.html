@@ -1704,9 +1704,61 @@ function restoreSnapshot(i){
   applyBackup(snap.backup,"antes de voltar a uma c\u00f3pia autom\u00e1tica");
 }
 try{takeSnapshot("abertura do sistema");}catch(e){}
+
+/* Unifica programa\u00e7\u00f5es antigas (uma por planta + "todas") em uma \u00fanica por m\u00eas. */
+function migrateSchedules(){
+  const sc=state.schedule||{}, groups={};
+  Object.keys(sc).forEach(k=>{const i=k.indexOf("|"); if(i<0)return; const ym=k.slice(0,i), p=k.slice(i+1); (groups[ym]=groups[ym]||{})[p]=k;});
+  const todo=Object.keys(groups).filter(ym=>Object.keys(groups[ym]).some(p=>p!=="all"));
+  if(!todo.length) return false;
+  takeSnapshot("antes de unificar programa\u00e7\u00f5es",true);
+  todo.forEach(ym=>{
+    const g=groups[ym];
+    let base=sc[ym+"|all"];
+    const others=Object.keys(g).filter(p=>p!=="all").map(p=>({p:normalizePlantName(p),s:sc[g[p]]})).filter(x=>x.s&&Array.isArray(x.s.assignments));
+    if(!base||!Array.isArray(base.assignments)){
+      const f=others[0]; if(!f){Object.keys(g).forEach(p=>{if(p!=="all")delete sc[g[p]];});return;}
+      base={ym,plantaFilter:"all",weeks:f.s.weeks,assignments:[],generatedAt:f.s.generatedAt};
+    }
+    base.plantaFilter="all";
+    ["FUNDI\u00c7\u00c3O","USINAGEM"].forEach(pl=>{
+      if(base.assignments.some(a=>normalizePlantName(a.planta)===pl)) return;
+      const src=others.find(x=>x.p===pl); if(!src) return;
+      src.s.assignments.filter(a=>normalizePlantName(a.planta)===pl).forEach(a=>{
+        base.assignments.push({...a,weekIdx:Math.min(a.weekIdx,base.weeks.length-1)});
+      });
+    });
+    sc[ym+"|all"]=base;
+    Object.keys(g).forEach(p=>{if(p!=="all")delete sc[g[p]];});
+  });
+  state.schedule=sc; saveState(); return true;
+}
+try{migrateSchedules();}catch(e){console.error("migrateSchedules",e);}
+
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
 function fmtDate(d){ if(!d)return ""; const x=String(d).slice(0,10).split("-"); return x.length===3?`${x[2]}/${x[1]}/${x[0]}`:d; }
-function nav(page){closeMobileMenu();document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page).classList.add("active");document.querySelectorAll(".side-nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="dashboard"){renderDashboardTabs();renderDashboard();}if(page==="pendencias")renderPendencias();if(page==="programacao")initSchedulePage();if(page==="historico"){populateHistoryAuditors();renderHistorico();}if(page==="cadastro"){showCadastroTab("colaboradores");renderCollaborators();}if(page==="relatorios"){const rm=document.getElementById("reportMonth");if(rm&&!rm.onchange)rm.onchange=renderReports;renderReports();}if(page==="ajuda"){document.querySelectorAll("#ajuda .help-panel").forEach(p=>p.classList.remove("active"));document.querySelectorAll("#ajuda .help-tab").forEach(b=>{b.classList.remove("active");b.setAttribute("aria-selected","false");});const intro=document.getElementById("help-intro");if(intro)intro.style.display="block";}}
+
+/* ===== SENHA DA ABA CADASTRO ===== */
+const CADASTRO_SENHA="1966";
+function cadastroLiberado(){try{return sessionStorage.getItem("cadastro_liberado")==="1";}catch(e){return false;}}
+function askCadastroPassword(){
+  closeMobileMenu();
+  const m=document.getElementById("cadModal"), inp=document.getElementById("cadPass");
+  document.getElementById("cadPassErr").textContent=""; inp.value="";
+  m.classList.add("open"); setTimeout(()=>inp.focus(),50);
+}
+function closeCadastroPassword(){document.getElementById("cadModal")?.classList.remove("open");}
+function submitCadastroPassword(){
+  const v=document.getElementById("cadPass").value.trim();
+  if(v===CADASTRO_SENHA){
+    try{sessionStorage.setItem("cadastro_liberado","1");}catch(e){}
+    closeCadastroPassword(); nav("cadastro");
+  }else{
+    document.getElementById("cadPassErr").textContent="Senha incorreta.";
+    document.getElementById("cadPass").value=""; document.getElementById("cadPass").focus();
+  }
+}
+function nav(page){if(page==="cadastro"&&!cadastroLiberado()){askCadastroPassword();return;}closeMobileMenu();document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page).classList.add("active");document.querySelectorAll(".side-nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="dashboard"){renderDashboardTabs();renderDashboard();}if(page==="pendencias")renderPendencias();if(page==="programacao")initSchedulePage();if(page==="historico"){populateHistoryAuditors();renderHistorico();}if(page==="cadastro"){showCadastroTab("colaboradores");renderCollaborators();}if(page==="relatorios"){const rm=document.getElementById("reportMonth");if(rm&&!rm.onchange)rm.onchange=renderReports;renderReports();}if(page==="ajuda"){document.querySelectorAll("#ajuda .help-panel").forEach(p=>p.classList.remove("active"));document.querySelectorAll("#ajuda .help-tab").forEach(b=>{b.classList.remove("active");b.setAttribute("aria-selected","false");});const intro=document.getElementById("help-intro");if(intro)intro.style.display="block";}}
 function openHelpTab(id, btn){
   const help=document.getElementById("ajuda");
   if(!help) return;
@@ -1917,14 +1969,16 @@ function renderDashboard(){
  const A=answers.filter(x=>x==="A").length,P=answers.filter(x=>x==="P").length,N=answers.filter(x=>x==="N").length;
  const pend=rec.flatMap(r=>questions.map(q=>({r,q,v:r.answers?.[q.code],just:r.justificativas?.[q.code]||"",acao:r.acoesTomadas?.[q.code]||""}))).filter(x=>(x.v==="N"||x.v==="P")&&(!x.just.trim()||!x.acao.trim())).length;
  const totalNotas=answers.length;
- const pctConf=totalNotas?Math.round(A/totalNotas*1000)/10:0;
- const pctParcial=totalNotas?Math.round(P/totalNotas*1000)/10:0;
- const pctNaoConf=totalNotas?Math.round(N/totalNotas*1000)/10:0;
+ const validN=A+P+N; // N.A. n\u00e3o entra no c\u00e1lculo
+ const notaGeral=validN?Math.round((A*100+P*50)/validN*10)/10:0;
+ const pctConf=validN?Math.round(A/validN*1000)/10:0;
+ const pctParcial=validN?Math.round(P/validN*1000)/10:0;
+ const pctNaoConf=validN?Math.round(N/validN*1000)/10:0;
  const conf=Math.round(pctConf);
  const metrics=[
   ["AUDITORIAS",rec.length,""],
   ["RESPOSTAS",totalNotas,"blue"],
-  ["CONFORME %",pctConf.toLocaleString("pt-BR")+"%",""],
+  ["NOTA GERAL %",notaGeral.toLocaleString("pt-BR")+"%",""],
   ["PARCIAL %",pctParcial.toLocaleString("pt-BR")+"%","yellow"],
   ["N\u00c3O CONFORME %",pctNaoConf.toLocaleString("pt-BR")+"%","red"],
   ["PEND\u00caNCIAS",pend,"orange"]
@@ -1934,8 +1988,8 @@ function renderDashboard(){
 
  let bars="";
  categories.forEach(([cat,codes])=>{
-   let vals=[];rec.forEach(r=>codes.forEach(c=>{if(r.answers?.[c])vals.push(r.answers[c])}));
-   let pct=vals.length?Math.round(vals.filter(x=>x==="A").length/vals.length*100):0;
+   let vals=[];rec.forEach(r=>codes.forEach(c=>{const v=r.answers?.[c];if(v==="A"||v==="P"||v==="N")vals.push(v)}));
+   let pct=vals.length?Math.round(vals.reduce((s,x)=>s+(x==="A"?100:x==="P"?50:0),0)/vals.length):0;
    bars+=`<div class="progress-row"><b>${esc(cat)}</b><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><b class="right">${pct}%</b></div>`;
  });
  document.getElementById("catBars").innerHTML=bars||'<div class="empty">Sem dados para o filtro.</div>';
@@ -1949,7 +2003,7 @@ function renderDashboard(){
  const localMap={};
  rec.forEach(r=>{localMap[r.local]??={aud:0,a:0,p:0,n:0};localMap[r.local].aud++;Object.values(r.answers||{}).forEach(v=>{if(v==="A")localMap[r.local].a++;if(v==="P")localMap[r.local].p++;if(v==="N")localMap[r.local].n++;});});
  const locals=Object.entries(localMap).sort((a,b)=>b[1].aud-a[1].aud).slice(0,12);
- document.getElementById("localSummary").innerHTML=locals.length?`<table class="mini-table"><thead><tr><th>Local</th><th>Aud.</th><th>A</th><th>P</th><th>N</th><th>Conf.</th></tr></thead><tbody>${locals.map(([l,v])=>`<tr class="clickable" onclick="setDashLocal('${String(l).replace(/'/g,"\\'")}')"><td>${esc(l)}</td><td>${v.aud}</td><td>${v.a}</td><td>${v.p}</td><td>${v.n}</td><td><b>${v.a+v.p+v.n?Math.round(v.a/(v.a+v.p+v.n)*100):0}%</b></td></tr>`).join("")}</tbody></table>`:'<div class="empty">Sem dados.</div>';
+ document.getElementById("localSummary").innerHTML=locals.length?`<table class="mini-table"><thead><tr><th>Local</th><th>Aud.</th><th>A</th><th>P</th><th>N</th><th>Conf.</th></tr></thead><tbody>${locals.map(([l,v])=>`<tr class="clickable" onclick="setDashLocal('${String(l).replace(/'/g,"\\'")}')"><td>${esc(l)}</td><td>${v.aud}</td><td>${v.a}</td><td>${v.p}</td><td>${v.n}</td><td><b>${v.a+v.p+v.n?Math.round((v.a*100+v.p*50)/(v.a+v.p+v.n)):0}%</b></td></tr>`).join("")}</tbody></table>`:'<div class="empty">Sem dados.</div>';
 
  const pendItems=rec.flatMap(r=>questions.map(q=>({r,q,v:r.answers?.[q.code],just:r.justificativas?.[q.code]||"",acao:r.acoesTomadas?.[q.code]||""}))).filter(x=>(x.v==="N"||x.v==="P")&&(!x.just.trim()||!x.acao.trim())).slice(0,8);
  document.getElementById("pendingSummary").innerHTML=pendItems.length?`<table class="mini-table"><thead><tr><th>Data</th><th>Local</th><th>Item</th><th>Nota</th><th>Status</th></tr></thead><tbody>${pendItems.map(x=>{const status=!x.just.trim()?"PENDENTE":!x.acao.trim()?"AGUARDANDO A\u00c7\u00c3O":"RESOLVIDA";return `<tr><td>${fmtDate(x.r.data)}</td><td>${esc(x.r.local)}</td><td>${esc(x.q.code)}</td><td><span class="badge b-${x.v.toLowerCase()}">${x.v}</span></td><td><span class="badge ${status==='RESOLVIDA'?'b-resolved':status==='AGUARDANDO A\u00c7\u00c3O'?'b-action':'b-pend'}">${status}</span></td></tr>`}).join("")}</tbody></table><div style="margin-top:8px;font-size:11px;color:#666">${pend} pend\u00eancia(s) aguardando justificativa e/ou a\u00e7\u00e3o tomada.</div>`:'<div class="empty">Nenhuma pend\u00eancia ou a\u00e7\u00e3o em aberto.</div>';
@@ -2021,11 +2075,11 @@ function renderTrendChart(rec){
  rec.forEach(r=>{
   const mon=mondayOf(r.data); if(!mon)return;
   const key=mon.toISOString().slice(0,10);
-  weekMap[key]=weekMap[key]||{a:0,t:0};
-  Object.values(r.answers||{}).forEach(v=>{ if(v==="A"||v==="P"||v==="N"){weekMap[key].t++; if(v==="A")weekMap[key].a++;} });
+  weekMap[key]=weekMap[key]||{s:0,t:0};
+  Object.values(r.answers||{}).forEach(v=>{ if(v==="A"||v==="P"||v==="N"){weekMap[key].t++; weekMap[key].s+=(v==="A"?100:v==="P"?50:0);} });
  });
  const keys=Object.keys(weekMap).sort().slice(-12);
- const points=keys.map(k=>[fmtDate(k).slice(0,5),weekMap[k].t?Math.round(weekMap[k].a/weekMap[k].t*100):0]);
+ const points=keys.map(k=>[fmtDate(k).slice(0,5),weekMap[k].t?Math.round(weekMap[k].s/weekMap[k].t):0]);
  drawLineTrend("trendChart",points,"#1769aa");
 }
 function monthLabelPt(key){
@@ -2462,7 +2516,7 @@ function generateSchedule(ym,plantaFilter){
 
   return {ym,plantaFilter,weeks:weekData,assignments,generatedAt:new Date().toISOString()};
 }
-function scheduleKey(ym,planta){return ym+"|"+planta;}
+function scheduleKey(ym,planta){return ym+"|all";} // uma \u00fanica programa\u00e7\u00e3o por m\u00eas; a planta \u00e9 s\u00f3 filtro de exibi\u00e7\u00e3o
 function syncSchedule(sched){
   // Atualiza uma programa\u00e7\u00e3o j\u00e1 existente sem mexer nos nomes j\u00e1 programados:
   // remove s\u00f3 quem saiu do cadastro e encaixa s\u00f3 quem entrou.
@@ -2531,7 +2585,7 @@ function onGenerateSchedule(){
     alert(msg);
     return;
   }
-  state.schedule[key]=generateSchedule(ym,planta);
+  state.schedule[key]=generateSchedule(ym,"all");
   saveState();
   renderSchedule();
 }
@@ -2539,13 +2593,13 @@ function onRegenerateSchedule(){
   const ym=document.getElementById("schedMonth").value, planta=document.getElementById("schedPlanta").value;
   if(!ym){alert("Selecione o m\u00eas.");return;}
   const key=scheduleKey(ym,planta);
-  const label=planta==="all"?"todas as plantas":normalizePlantName(planta);
+  const label="todas as plantas";
   if(!confirm("Refazer do zero a programa\u00e7\u00e3o de "+ym.split("-").reverse().join("/")+" ("+label+")?\n\nTodos os nomes atuais ser\u00e3o sorteados novamente e os ajustes manuais ser\u00e3o perdidos. Auditorias j\u00e1 realizadas n\u00e3o s\u00e3o apagadas.")) return;
   if(state.schedule[key]){
     try{localStorage.setItem("auditoria_programacao_anterior",JSON.stringify({key,savedAt:new Date().toISOString(),schedule:state.schedule[key]}));}catch(e){}
   }
   takeSnapshot("antes de refazer a programa\u00e7\u00e3o",true);
-  state.schedule[key]=generateSchedule(ym,planta);
+  state.schedule[key]=generateSchedule(ym,"all");
   saveState();
   renderSchedule();
 }
@@ -2566,9 +2620,9 @@ function renderSchedule(){
   const ym=document.getElementById("schedMonth").value, planta=document.getElementById("schedPlanta").value;
   const key=scheduleKey(ym,planta);
   const sched=state.schedule[key];
-  document.getElementById("schedCount").textContent=sched?`${sched.assignments.length} auditoria(s) programada(s)`:"";
+  document.getElementById("schedCount").textContent=sched?`${sched.assignments.filter(a=>planta==="all"||normalizePlantName(a.planta)===normalizePlantName(planta)).length} auditoria(s) programada(s)`:"";
   if(!sched){
-    wrap.innerHTML='<div class="empty">Nenhuma programa\u00e7\u00e3o gerada para este m\u00eas/planta. Clique em "Gerar / Atualizar programa\u00e7\u00e3o".</div>';
+    wrap.innerHTML='<div class="empty">Nenhuma programa\u00e7\u00e3o gerada para este m\u00eas. Clique em "Gerar / Atualizar programa\u00e7\u00e3o".</div>';
     return;
   }
 
@@ -2735,16 +2789,18 @@ function renderReports(){
   });
   const rows=Object.entries(map).sort((a,b)=>b[1].aud-a[1].aud);
   document.getElementById("reportSector").innerHTML=rows.length
-    ? `<div class="report-table-wrap"><table class="report-table"><thead><tr><th>Setor</th><th class="num">Aud.</th><th class="num">A</th><th class="num">P</th><th class="num">N</th><th class="num">Conf.</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${v.aud}</td><td class="num">${v.a}</td><td class="num">${v.p}</td><td class="num">${v.n}</td><td class="percent">${v.a+v.p+v.n?Math.round(v.a/(v.a+v.p+v.n)*100):0}%</td></tr>`).join("")}</tbody></table></div>`
+    ? `<div class="report-table-wrap"><table class="report-table"><thead><tr><th>Setor</th><th class="num">Aud.</th><th class="num">A</th><th class="num">P</th><th class="num">N</th><th class="num">Conf.</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${v.aud}</td><td class="num">${v.a}</td><td class="num">${v.p}</td><td class="num">${v.n}</td><td class="percent">${v.a+v.p+v.n?Math.round((v.a*100+v.p*50)/(v.a+v.p+v.n)):0}%</td></tr>`).join("")}</tbody></table></div>`
     : '<div class="report-empty">Sem dados.</div>';
 
   let cats="";
   categories.forEach(([cat,codes])=>{
-    let a=0,t=0;
+    let sum=0,t=0;
     state.records.forEach(r=>codes.forEach(c=>{
-      if(r.answers?.[c]){t++;if(r.answers[c]==="A")a++}
+      const v=r.answers?.[c];
+      if(v==="A"||v==="P"||v==="N"){t++;sum+=(v==="A"?100:v==="P"?50:0);}
     }));
-    cats+=`<div class="progress-row"><b>${esc(cat)}</b><div class="progress-track"><div class="progress-fill" style="width:${t?Math.round(a/t*100):0}%"></div></div><b>${t?Math.round(a/t*100):0}%</b></div>`;
+    const pctCat=t?Math.round(sum/t):0;
+    cats+=`<div class="progress-row"><b>${esc(cat)}</b><div class="progress-track"><div class="progress-fill" style="width:${pctCat}%"></div></div><b>${pctCat}%</b></div>`;
   });
   document.getElementById("reportCategory").innerHTML=cats||'<div class="report-empty">Sem dados.</div>';
 
@@ -3698,6 +3754,15 @@ function openHelpTab(id,btn){
     <select id="moveWeek" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px"></select>
     <div class="online-help" style="margin-top:10px">S&#243; este nome &#233; alterado; o restante da programa&#231;&#227;o n&#227;o muda. Ajustes manuais s&#227;o mantidos ao usar "Gerar / Atualizar".</div>
     <div class="online-actions" style="margin-top:14px"><button class="secondary" type="button" onclick="closeMoveAssignment()">Cancelar</button><button class="primary" type="button" onclick="saveMoveAssignment()">Salvar</button></div>
+  </div>
+</div>
+<div id="cadModal" class="online-modal" role="dialog" aria-modal="true" aria-labelledby="cadModalTitle">
+  <div class="online-box">
+    <h2 id="cadModalTitle">&#128274; Cadastros</h2>
+    <p>Digite a senha para acessar os cadastros.</p>
+    <input id="cadPass" type="password" inputmode="numeric" autocomplete="off" placeholder="Senha" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px" onkeydown="if(event.key==='Enter')submitCadastroPassword()">
+    <div id="cadPassErr" style="color:#b91c1c;font-size:12px;min-height:16px;margin-top:6px"></div>
+    <div class="online-actions" style="margin-top:10px"><button class="secondary" type="button" onclick="closeCadastroPassword()">Cancelar</button><button class="primary" type="button" onclick="submitCadastroPassword()">Entrar</button></div>
   </div>
 </div>
 </body>
