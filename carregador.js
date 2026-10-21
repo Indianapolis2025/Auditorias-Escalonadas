@@ -8,18 +8,18 @@
   var DADOS=["perguntas-usinagem","perguntas-fundicao","locais","historico-inicial","colaboradores","auditores","firebase-config","perguntas-gerencial","gestores"];
 
   function getJSON(nome){
-    var u="data/"+nome+".json?v="+V;
+    var u=nome+".json?v="+V;
     return fetch(u,{cache:"no-cache"}).then(function(r){
-      if(!r.ok) throw new Error("data/"+nome+".json (HTTP "+r.status+")");
+      if(!r.ok) throw new Error(nome+".json (HTTP "+r.status+")");
       return r.json();
     });
   }
   function loadScript(nome){
     return new Promise(function(ok,erro){
       var s=document.createElement("script");
-      s.src="js/"+nome+".js?v="+V; s.async=false;
+      s.src=nome+".js?v="+V; s.async=false;
       s.onload=ok;
-      s.onerror=function(){erro(new Error("js/"+nome+".js"));};
+      s.onerror=function(){erro(new Error(nome+".js"));};
       document.head.appendChild(s);
     });
   }
@@ -29,7 +29,7 @@
     d.style.cssText="position:fixed;inset:0;z-index:99999;background:#fff;color:#111;padding:28px;font:16px/1.5 Arial,sans-serif;overflow:auto";
     d.innerHTML="<h2>N\u00e3o foi poss\u00edvel carregar o sistema</h2>"+
       "<p>Arquivo com problema: <b>"+String(e&&e.message||e)+"</b></p>"+
-      "<p>Confira se a pasta inteira foi enviada ao GitHub (index.html, css, js, data e assets) e aguarde alguns minutos para o GitHub Pages atualizar.</p>"+
+      "<p>Confira se todos os arquivos (index.html, .css, .js, .json e logo.png) foram enviados ao GitHub, todos na raiz do reposit\u00f3rio, e aguarde alguns minutos para o GitHub Pages atualizar.</p>"+
       "<p>Se voc\u00ea abriu o <code>index.html</code> direto do computador, isso n\u00e3o funciona: publique no GitHub Pages ou abra por um servidor local (por exemplo, <code>python -m http.server</code> dentro da pasta).</p>";
     document.body.appendChild(d);
   }
