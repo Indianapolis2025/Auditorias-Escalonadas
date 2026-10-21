@@ -120,8 +120,11 @@ function generateSchedule(ym,plantaFilter){
     }
     // Distribui nas semanas: cada auditor faz uma por semana; o excedente vai para a última semana.
     auditors.forEach(a=>{
-      asg.filter(x=>x.a===a).forEach((x,t)=>{
-        if(t<weeks.length) assignments.push({weekIdx:t,auditor:a,colaborador:x.c,planta});
+      const mine=asg.filter(x=>x.a===a), k=mine.length;
+      mine.forEach((x,t)=>{
+        // Até o número de semanas: espalha as auditorias ao longo do mês (não deixa as últimas semanas vazias).
+        if(k<=weeks.length) assignments.push({weekIdx:Math.min(weeks.length-1,Math.floor((t+0.5)*weeks.length/k)),auditor:a,colaborador:x.c,planta});
+        else if(t<weeks.length) assignments.push({weekIdx:t,auditor:a,colaborador:x.c,planta});
         else assignments.push({weekIdx:weeks.length-1,auditor:a,colaborador:x.c,planta,extra:true});
       });
     });
