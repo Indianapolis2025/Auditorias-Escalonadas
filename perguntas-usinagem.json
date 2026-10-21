@@ -1,0 +1,235 @@
+{
+ "questions": [
+  {
+   "code": "A",
+   "text": "Observado alguma situa\u00e7\u00e3o de inseguran\u00e7a no local de trabalho?",
+   "col": 10,
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "B",
+   "text": "Observado alguma a\u00e7\u00e3o insegura do operador?",
+   "col": 12,
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "C",
+   "text": "Operador utilizando EPIs adequadamente?",
+   "col": 14,
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "D",
+   "text": "O local de trabalho encontra-se limpo e organizado?",
+   "col": 17,
+   "category": "Housekeeping (Casa Limpa)"
+  },
+  {
+   "code": "E",
+   "text": "Existe local adequado para aloca\u00e7\u00e3o de EIMEs ou calibradores?",
+   "col": 19,
+   "category": "Housekeeping (Casa Limpa)"
+  },
+  {
+   "code": "F",
+   "text": "Produtos quimicos est\u00e3o identificados e alocados adequadamente?",
+   "col": 21,
+   "category": "Housekeeping (Casa Limpa)"
+  },
+  {
+   "code": "G",
+   "text": "M\u00e1quina encontra-se limpa?",
+   "col": 23,
+   "category": "Housekeeping (Casa Limpa)"
+  },
+  {
+   "code": "H",
+   "text": "vazamento de \u00f3leo de  m\u00e1quina est\u00e1 sendo contido adequadamente?",
+   "col": 25,
+   "category": "Housekeeping (Casa Limpa)"
+  },
+  {
+   "code": "I",
+   "text": "Registro de Inspe\u00e7\u00e3o no Processo FQ016 est\u00e1 devidamente preenchido?",
+   "col": 32,
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "J",
+   "text": "O operador evidencia as medi\u00e7\u00f5es realizadas? Segue a frequ\u00eancia estabelecida no plano de controle?",
+   "col": 34,
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "K",
+   "text": "Em caso de N\u00c3O CONFORMIDADE, h\u00e1 desvio ou autoriza\u00e7\u00e3o?",
+   "col": 36,
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "L",
+   "text": "Existe evid\u00eancia da libera\u00e7\u00e3o de trabalho ap\u00f3s Setup (L\u00edder ou Preparador)?",
+   "col": 38,
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "M",
+   "text": "O  check List de manuten\u00e7\u00e3o est\u00e1 sendo preenchido corretamente?",
+   "col": 40,
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "N",
+   "text": "Folha de Processo; Plano de Controle; Instru\u00e7\u00f5es de Setup e Instru\u00e7\u00f5es de trabalho encontram-se dispon\u00edveis no posto de trabalho?",
+   "col": 45,
+   "category": "Doc. de Processos"
+  },
+  {
+   "code": "O",
+   "text": "Estes documentos encontram-se atualizados? (Definido X Realizado no posto de trabalho)",
+   "col": 47,
+   "category": "Doc. de Processos"
+  },
+  {
+   "code": "P",
+   "text": "Estes documentos est\u00e3o isentos de rasuras?",
+   "col": 49,
+   "category": "Doc. de Processos"
+  },
+  {
+   "code": "Q",
+   "text": "Os instrumentos de medi\u00e7\u00e3o e calibradores solicitados no plano de controle encontram-se dispon\u00edveis na opera\u00e7\u00e3o?",
+   "col": 74,
+   "category": "Instrumentos de Medi\u00e7\u00e3o"
+  },
+  {
+   "code": "R",
+   "text": "Os calibradores/Instrumentos s\u00e3o armazenados adequadamente e est\u00e3o em bom estado de uso?",
+   "col": 76,
+   "category": "Instrumentos de Medi\u00e7\u00e3o"
+  },
+  {
+   "code": "S",
+   "text": "Os calibradores/instrumentos est\u00e3o aferidos e com calibra\u00e7\u00e3o dentro do prazo?",
+   "col": 78,
+   "category": "Instrumentos de Medi\u00e7\u00e3o"
+  },
+  {
+   "code": "T",
+   "text": "A etiqueta de identifica\u00e7\u00e3o est\u00e1 leg\u00edvel?",
+   "col": 80,
+   "category": "Instrumentos de Medi\u00e7\u00e3o"
+  },
+  {
+   "code": "U",
+   "text": "Calibrador est\u00e1 aferido e na medida?",
+   "col": 82,
+   "category": "Instrumentos de Medi\u00e7\u00e3o"
+  },
+  {
+   "code": "V",
+   "text": "As pe\u00e7as n\u00e3o conformes encontram-se segregadas e dentro da \u00e1rea demarcada?",
+   "col": 85,
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "W",
+   "text": "As pe\u00e7as est\u00e3o com ficha de identifica\u00e7\u00e3o anexada e preenchida corretamente? (FQ)",
+   "col": 87,
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "X",
+   "text": "Dentro do prazo para disposi\u00e7\u00e3o do material? (M\u00c1XIMO 1 DIA)",
+   "col": 89,
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "Y",
+   "text": "Toda pe\u00e7a acabada ou em processo est\u00e1  identificada corretamente?  (FQ)",
+   "col": 94,
+   "category": "Armazenamento / Identifica\u00e7\u00e3o"
+  },
+  {
+   "code": "Z",
+   "text": "As pe\u00e7as retrabalho se encontram segregadas e Identificadas?",
+   "col": 107,
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho"
+  },
+  {
+   "code": "AA",
+   "text": "A ficha (FQ099) est\u00e1 identificada com informa\u00e7\u00f5es com informa\u00e7\u00f5es necess\u00e1rias para o retrabalho?",
+   "col": 109,
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho"
+  }
+ ],
+ "categories": [
+  [
+   "Seguran\u00e7a",
+   [
+    "A",
+    "B",
+    "C"
+   ]
+  ],
+  [
+   "Housekeeping (Casa Limpa)",
+   [
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+   ]
+  ],
+  [
+   "Registros de Controle",
+   [
+    "I",
+    "J",
+    "K",
+    "L",
+    "M"
+   ]
+  ],
+  [
+   "Doc. de Processos",
+   [
+    "N",
+    "O",
+    "P"
+   ]
+  ],
+  [
+   "Instrumentos de Medi\u00e7\u00e3o",
+   [
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U"
+   ]
+  ],
+  [
+   "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK",
+   [
+    "V",
+    "W",
+    "X"
+   ]
+  ],
+  [
+   "Armazenamento / Identifica\u00e7\u00e3o",
+   [
+    "Y"
+   ]
+  ],
+  [
+   "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho",
+   [
+    "Z",
+    "AA"
+   ]
+  ]
+ ]
+}

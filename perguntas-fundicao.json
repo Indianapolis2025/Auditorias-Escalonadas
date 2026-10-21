@@ -1,0 +1,202 @@
+{
+ "questions": [
+  {
+   "code": "A",
+   "text": "Observada alguma situa\u00e7\u00e3o de inseguran\u00e7a no local de trabalho?",
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "B",
+   "text": "Observada alguma a\u00e7\u00e3o insegura do operador?",
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "C",
+   "text": "Operador utilizando EPI\u2019s adequadamente?",
+   "category": "Seguran\u00e7a"
+  },
+  {
+   "code": "D",
+   "text": "Local de trabalho est\u00e1 limpo e organizado?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "E",
+   "text": "Existe local adequado para aloca\u00e7\u00e3o das ferramentas?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "F",
+   "text": "Produtos qu\u00edmicos est\u00e3o identificados e alocados adequadamente?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "G",
+   "text": "M\u00e1quinas est\u00e3o limpas?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "H",
+   "text": "Em caso de vazamentos, est\u00e3o sendo contidos adequadamente?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "I",
+   "text": "H\u00e1 necessidade de alguma manuten\u00e7\u00e3o no setor?",
+   "category": "Housekeeping"
+  },
+  {
+   "code": "J",
+   "text": "Registros da qualidade (FQ\u2019s e outros) est\u00e3o devidamente preenchidos?",
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "K",
+   "text": "Colaborador evidencia as confer\u00eancias (Quantidade, OF, Material, entre outros)?",
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "L",
+   "text": "Em caso de N\u00c3O CONFORMIDADE, h\u00e1 desvio ou autoriza\u00e7\u00e3o?",
+   "category": "Registros de Controle"
+  },
+  {
+   "code": "M",
+   "text": "E-kanbans encontram-se dispon\u00edveis no local?",
+   "category": "Documentos de Processos"
+  },
+  {
+   "code": "N",
+   "text": "Est\u00e3o atualizados?",
+   "category": "Documentos de Processos"
+  },
+  {
+   "code": "O",
+   "text": "Isentos de rasuras?",
+   "category": "Documentos de Processos"
+  },
+  {
+   "code": "P",
+   "text": "Ferramentas adequadas est\u00e3o dispon\u00edveis?",
+   "category": "Ferramentas"
+  },
+  {
+   "code": "Q",
+   "text": "As ferramentas s\u00e3o armazenadas adequadamente e est\u00e3o em bom estado de uso?",
+   "category": "Ferramentas"
+  },
+  {
+   "code": "R",
+   "text": "Se houver Instrumentos de medi\u00e7\u00e3o, est\u00e3o calibrados?",
+   "category": "Ferramentas"
+  },
+  {
+   "code": "S",
+   "text": "A etiqueta de identifica\u00e7\u00e3o est\u00e1 leg\u00edvel?",
+   "category": "Ferramentas"
+  },
+  {
+   "code": "T",
+   "text": "Foram aferidos ou limpos hoje?",
+   "category": "Ferramentas"
+  },
+  {
+   "code": "U",
+   "text": "As pe\u00e7as n\u00e3o conformes encontram-se segregadas e identificadas?",
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "V",
+   "text": "As fichas de identifica\u00e7\u00e3o est\u00e3o anexadas e preenchidas corretamente? (FQ 13)",
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "W",
+   "text": "Dentro do prazo para disposi\u00e7\u00e3o do material? (M\u00c1XIMO 1 DIA)",
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK"
+  },
+  {
+   "code": "X",
+   "text": "Pe\u00e7as em processo ou em espera est\u00e3o identificadas (FQ 53) adequadamente?",
+   "category": "Armazenamento e Identifica\u00e7\u00e3o"
+  },
+  {
+   "code": "Y",
+   "text": "As pe\u00e7as para retrabalho encontram-se segregadas e identificadas?",
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho"
+  },
+  {
+   "code": "Z",
+   "text": "A ficha de identifica\u00e7\u00e3o est\u00e1 preenchida com as informa\u00e7\u00f5es necess\u00e1ria para o retrabalho? (FQ099)",
+   "category": "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho"
+  }
+ ],
+ "categories": [
+  [
+   "Seguran\u00e7a",
+   [
+    "A",
+    "B",
+    "C"
+   ]
+  ],
+  [
+   "Housekeeping",
+   [
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I"
+   ]
+  ],
+  [
+   "Registros de Controle",
+   [
+    "J",
+    "K",
+    "L"
+   ]
+  ],
+  [
+   "Documentos de Processos",
+   [
+    "M",
+    "N",
+    "O"
+   ]
+  ],
+  [
+   "Ferramentas",
+   [
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T"
+   ]
+  ],
+  [
+   "Identifica\u00e7\u00e3o de Pe\u00e7as N/OK",
+   [
+    "U",
+    "V",
+    "W"
+   ]
+  ],
+  [
+   "Armazenamento e Identifica\u00e7\u00e3o",
+   [
+    "X"
+   ]
+  ],
+  [
+   "Identifica\u00e7\u00e3o de Pe\u00e7as Para Retrabalho",
+   [
+    "Y",
+    "Z"
+   ]
+  ]
+ ]
+}

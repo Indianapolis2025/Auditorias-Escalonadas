@@ -1,0 +1,15 @@
+/* Auditoria Gerencial */
+.ger-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.ger-tab{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
+.ger-tab.active{background:#0f4c81;border-color:#0f4c81;color:#fff}
+.ger-panel{display:none}.ger-panel.active{display:block}
+.ger-item{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:3px 0;font-size:12px}
+.ger-item a{cursor:pointer;font-weight:700;color:inherit;text-decoration:underline dotted}
+.ger-note{font-size:12px;color:#64748b;margin:6px 0}
+.ger-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.ger-kpi{border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:12px;background:#fff}
+.ger-kpi b{display:block;font-size:22px}
+.ger-kpi span{font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase}
+html[data-theme="dark"] .ger-tab{background:#1e293b;border-color:#334155;color:#e2e8f0}
+html[data-theme="dark"] .ger-tab.active{background:#2563eb;border-color:#2563eb;color:#fff}
+html[data-theme="dark"] .ger-kpi{background:#1e293b;border-color:#334155}

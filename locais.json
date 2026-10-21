@@ -1,0 +1,272 @@
+[
+ {
+  "local": "TC01",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC02",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC10",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC12",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC14",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC15",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TC16",
+  "setor": "CNC",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "CT01",
+  "setor": "CENTRO DE USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "CT02",
+  "setor": "CENTRO DE USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "CT03",
+  "setor": "CENTRO DE USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "CF01",
+  "setor": "CENTRO DE FURA\u00c7\u00c3O",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "B01",
+  "setor": "BRUNIDORA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU01",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU02",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU03",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU04",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU05",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU06",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU07",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FU08",
+  "setor": "FURADEIRA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F01",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F02",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F03",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F04",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F05",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F06",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F07",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "F08",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "R02",
+  "setor": "RETIFICA",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TB01",
+  "setor": "TAMBOREADOR",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TB02",
+  "setor": "TAMBOREADOR",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TB03",
+  "setor": "TAMBOREADOR",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "PL01",
+  "setor": "POLICORTE",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "PL02",
+  "setor": "POLICORTE",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "EXPEDI\u00c7\u00c3O USINAGEM",
+  "setor": "EXPEDI\u00c7\u00c3O USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "EMBALAGEM USINAGEM",
+  "setor": "EMBALAGEM USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "ALMOXARIFADO USINAGEM",
+  "setor": "ALMOXARIFADO USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "MODELA\u00c7\u00c3O",
+  "setor": "MODELA\u00c7\u00c3O",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "COLD BOX",
+  "setor": "COLD BOX",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "PEP SET",
+  "setor": "PEP SET",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "FUS\u00c3O",
+  "setor": "FUS\u00c3O",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "FORNO",
+  "setor": "FORNO",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "LINHA DE FUS\u00c3O ",
+  "setor": "LINHA DE FUS\u00c3O ",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "DESMOLDAGEM",
+  "setor": "DESMOLDAGEM",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "REBARBA\u00c7\u00c3O",
+  "setor": "REBARBA\u00c7\u00c3O",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "ALMOXARIFADO FUNDI\u00c7\u00c3O",
+  "setor": "ALMOXARIFADO FUNDI\u00c7\u00c3O",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "EXPEDI\u00c7\u00c3O FUNDI\u00c7\u00c3O",
+  "setor": "EXPEDI\u00c7\u00c3O FUNDI\u00c7\u00c3O",
+  "planta": "FUNDI\u00c7\u00c3O"
+ },
+ {
+  "local": "T01",
+  "setor": "TORNO",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "T02",
+  "setor": "TORNO",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "T03",
+  "setor": "TORNO",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "FRESAS",
+  "setor": "FRESAS",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "TAMBOREADOR",
+  "setor": "TAMBOREADOR",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "GRAVA\u00c7\u00c3O",
+  "setor": "EMBALAGEM USINAGEM",
+  "planta": "USINAGEM"
+ },
+ {
+  "local": "POKA YOKE",
+  "setor": "INSPE\u00c7\u00c3O",
+  "planta": "USINAGEM"
+ }
+]

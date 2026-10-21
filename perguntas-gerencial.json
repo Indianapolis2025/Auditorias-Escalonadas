@@ -1,0 +1,60 @@
+{
+ "aviso": "PERGUNTAS DE EXEMPLO - substitua pelas perguntas reais mantendo o formato (code, category, text).",
+ "questions": [
+  {
+   "code": "G01",
+   "category": "Seguran\u00e7a",
+   "text": "Os colaboradores usam os EPIs corretos e em bom estado nesta \u00e1rea?"
+  },
+  {
+   "code": "G02",
+   "category": "Seguran\u00e7a",
+   "text": "As \u00e1reas de circula\u00e7\u00e3o, sa\u00eddas de emerg\u00eancia e extintores est\u00e3o livres e sinalizados?"
+  },
+  {
+   "code": "G03",
+   "category": "Seguran\u00e7a",
+   "text": "Foram observadas condi\u00e7\u00f5es ou atos inseguros durante a visita?"
+  },
+  {
+   "code": "G04",
+   "category": "Organiza\u00e7\u00e3o e Limpeza (5S)",
+   "text": "O setor est\u00e1 organizado e limpo, com materiais nos locais definidos?"
+  },
+  {
+   "code": "G05",
+   "category": "Organiza\u00e7\u00e3o e Limpeza (5S)",
+   "text": "Ferramentas, dispositivos e instrumentos est\u00e3o identificados e bem guardados?"
+  },
+  {
+   "code": "G06",
+   "category": "Qualidade e Processo",
+   "text": "Os padr\u00f5es de trabalho e instru\u00e7\u00f5es est\u00e3o dispon\u00edveis e s\u00e3o seguidos?"
+  },
+  {
+   "code": "G07",
+   "category": "Qualidade e Processo",
+   "text": "Pe\u00e7as n\u00e3o conformes est\u00e3o identificadas e segregadas?"
+  },
+  {
+   "code": "G08",
+   "category": "Qualidade e Processo",
+   "text": "Os registros de controle do processo est\u00e3o preenchidos corretamente?"
+  },
+  {
+   "code": "G09",
+   "category": "Gest\u00e3o Visual e Pessoas",
+   "text": "Os indicadores do setor est\u00e3o atualizados e vis\u00edveis para a equipe?"
+  },
+  {
+   "code": "G10",
+   "category": "Gest\u00e3o Visual e Pessoas",
+   "text": "A lideran\u00e7a conhece os resultados e as a\u00e7\u00f5es em andamento do setor?"
+  },
+  {
+   "code": "G11",
+   "category": "Gest\u00e3o Visual e Pessoas",
+   "text": "Os colaboradores sabem explicar suas fun\u00e7\u00f5es e os padr\u00f5es da sua atividade?"
+  }
+ ]
+}

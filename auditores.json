@@ -1,0 +1,40 @@
+{
+ "padrao": [
+  "Ryan A",
+  "Tiago B",
+  "Gabriel A",
+  "Ant\u00f4nio D",
+  "Jambres",
+  "Johnny",
+  "Josemario",
+  "Jose Raimundo"
+ ],
+ "plantas_permitidas": {
+  "Ryan A": [
+   "USINAGEM",
+   "FUNDI\u00c7\u00c3O"
+  ],
+  "Tiago B": [
+   "USINAGEM",
+   "FUNDI\u00c7\u00c3O"
+  ],
+  "Gabriel A": [
+   "FUNDI\u00c7\u00c3O"
+  ],
+  "Ant\u00f4nio D": [
+   "FUNDI\u00c7\u00c3O"
+  ],
+  "Jambres": [
+   "FUNDI\u00c7\u00c3O"
+  ],
+  "Johnny": [
+   "USINAGEM"
+  ],
+  "Josemario": [
+   "USINAGEM"
+  ],
+  "Jose Raimundo": [
+   "USINAGEM"
+  ]
+ }
+}

@@ -1,0 +1,364 @@
+/* ===== TEMA FUNCIONAL — aplicado ao documento principal ===== */
+:root{
+  color-scheme:light;
+  --theme-bg:#f3f7fa;
+  --theme-surface:#ffffff;
+  --theme-surface-2:#f7fafc;
+  --theme-text:#16324b;
+  --theme-muted:#6d7d8c;
+  --theme-line:#d9e3ea;
+  --theme-input:#ffffff;
+  --theme-hover:#f1f5f8;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --theme-bg:#0f172a;
+  --theme-surface:#1e293b;
+  --theme-surface-2:#172033;
+  --theme-text:#ffffff;
+  --theme-muted:#a9b7c7;
+  --theme-line:#334155;
+  --theme-input:#111827;
+  --theme-hover:#263449;
+}
+html[data-theme="dark"] body{
+  background:var(--theme-bg)!important;
+  color:var(--theme-text)!important;
+}
+html[data-theme="dark"] .content-shell,
+html[data-theme="dark"] main{
+  background:var(--theme-bg)!important;
+}
+html[data-theme="dark"] .topbar{
+  background:#111827!important;
+  border-bottom-color:var(--theme-line)!important;
+  color:var(--theme-text)!important;
+}
+html[data-theme="dark"] .top-title,
+html[data-theme="dark"] .top-info,
+html[data-theme="dark"] .top-user,
+html[data-theme="dark"] .top-info b,
+html[data-theme="dark"] .top-user b{
+  color:var(--theme-text)!important;
+}
+html[data-theme="dark"] .top-sub,
+html[data-theme="dark"] .sub,
+html[data-theme="dark"] .side-title{
+  color:var(--theme-muted)!important;
+}
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .excel-card,
+html[data-theme="dark"] .kpi,
+html[data-theme="dark"] .filter,
+html[data-theme="dark"] .dashboard-toolbar,
+html[data-theme="dark"] .question,
+html[data-theme="dark"] .cad-tab,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .box{
+  background:var(--theme-surface)!important;
+  color:var(--theme-text)!important;
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] .excel-card .card-head{
+  background:var(--theme-surface-2)!important;
+  color:var(--theme-text)!important;
+  border-bottom-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] .kpi:first-child{
+  background:linear-gradient(135deg,#172a40,#1f405c)!important;
+}
+html[data-theme="dark"] .kpi .num{
+  color:#ffffff!important;
+}
+html[data-theme="dark"] .kpi .caption,
+html[data-theme="dark"] .label,
+html[data-theme="dark"] .qcat,
+html[data-theme="dark"] .field label,
+html[data-theme="dark"] .filter label,
+html[data-theme="dark"] .progress-row,
+html[data-theme="dark"] .legend,
+html[data-theme="dark"] .notice{
+  color:var(--theme-muted)!important;
+}
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] .qtext,
+html[data-theme="dark"] .excel-card .card-head,
+html[data-theme="dark"] .cad-panel h2{
+  color:var(--theme-text)!important;
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .filter select,
+html[data-theme="dark"] .filter input,
+html[data-theme="dark"] .dashboard-filter-group select,
+html[data-theme="dark"] .pend-edit textarea{
+  background:var(--theme-input)!important;
+  color:var(--theme-text)!important;
+  border-color:#475569!important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{
+  color:#7f8da0!important;
+}
+html[data-theme="dark"] table,
+html[data-theme="dark"] .mini-table{
+  background:var(--theme-surface)!important;
+}
+html[data-theme="dark"] th,
+html[data-theme="dark"] .mini-table th{
+  background:#263244!important;
+  color:#e5edf5!important;
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] td{
+  color:#dbe5ef!important;
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] tr:hover td{
+  background:var(--theme-hover)!important;
+}
+html[data-theme="dark"] .choices button{
+  background:#172033!important;
+  color:#dbe5ef!important;
+  border-color:#475569!important;
+}
+html[data-theme="dark"] .choices button.sel-A{
+  background:#123b2a!important;color:#9ae6b4!important;border-color:#23865b!important;
+}
+html[data-theme="dark"] .choices button.sel-P{
+  background:#493815!important;color:#fcd88b!important;border-color:#9a7418!important;
+}
+html[data-theme="dark"] .choices button.sel-N{
+  background:#481d22!important;color:#fecaca!important;border-color:#9f3038!important;
+}
+html[data-theme="dark"] .choices button.sel-NA{
+  background:#242b55!important;color:#c7d2fe!important;border-color:#5967b3!important;
+}
+html[data-theme="dark"] .secondary{
+  background:#1e293b!important;
+  color:#bfdbfe!important;
+  border-color:#64748b!important;
+}
+html[data-theme="dark"] .secondary:hover,
+html[data-theme="dark"] .cad-tab:hover{
+  background:#263449!important;
+}
+html[data-theme="dark"] .danger{
+  background:#1e293b!important;
+  color:#fecaca!important;
+  border-color:#b91c1c!important;
+}
+html[data-theme="dark"] .notice{
+  background:#172554!important;
+  border-color:#1e40af!important;
+  color:#bfdbfe!important;
+}
+html[data-theme="dark"] .bar,
+html[data-theme="dark"] .progress-track{
+  background:#334155!important;
+}
+html[data-theme="dark"] .tablewrap{
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] .modal-head,
+html[data-theme="dark"] .modal-foot{
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="dark"] .modal-head button{
+  color:#e5edf5!important;
+}
+html[data-theme="dark"] .dashboard-toolbar>.secondary{
+  background:#1e293b!important;
+  color:#dbeafe!important;
+  border-color:#475569!important;
+}
+html[data-theme="dark"] .theme-toggle{
+  background:rgba(255,255,255,.10)!important;
+  border-color:rgba(255,255,255,.35)!important;
+  color:#fff!important;
+}
+/* Mantém a barra lateral visualmente consistente nos dois temas. */
+html[data-theme="light"] .sidebar{
+  background:linear-gradient(180deg,#0c2235 0%,#122f45 52%,#0b2032 100%)!important;
+}
+html[data-theme="dark"] .sidebar{
+  background:linear-gradient(180deg,#08111f 0%,#0d1b2b 52%,#07101c 100%)!important;
+}
+html[data-theme="dark"] .brand-box{
+  background:linear-gradient(135deg,#0b1725,#102236)!important;
+}
+
+/* ===== CORREÇÃO DO TEMA CLARO ===== */
+html[data-theme="light"]{
+  color-scheme:light;
+  --theme-bg:#eef1f4;
+  --theme-surface:#ffffff;
+  --theme-surface-2:#f5f7fa;
+  --theme-text:#17212b;
+  --theme-muted:#526273;
+  --theme-line:#d9e3ea;
+  --theme-input:#ffffff;
+  --theme-hover:#f1f5f8;
+}
+html[data-theme="light"] body,
+html[data-theme="light"] main,
+html[data-theme="light"] .content-shell{
+  background:var(--theme-bg)!important;
+  color:var(--theme-text)!important;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .excel-card,
+html[data-theme="light"] .kpi,
+html[data-theme="light"] .filter,
+html[data-theme="light"] .dashboard-toolbar,
+html[data-theme="light"] .question,
+html[data-theme="light"] .cad-tab,
+html[data-theme="light"] .modal,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .box{
+  background:var(--theme-surface)!important;
+  color:var(--theme-text)!important;
+  border-color:var(--theme-line)!important;
+}
+html[data-theme="light"] .excel-card .card-head{
+  background:var(--theme-surface-2)!important;
+  color:var(--theme-text)!important;
+  border-bottom-color:var(--theme-line)!important;
+}
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .qtext,
+html[data-theme="light"] .top-title,
+html[data-theme="light"] .top-info,
+html[data-theme="light"] .top-user,
+html[data-theme="light"] .top-info b,
+html[data-theme="light"] .top-user b,
+html[data-theme="light"] .cad-panel h2{
+  color:var(--theme-text)!important;
+}
+html[data-theme="light"] .sub,
+html[data-theme="light"] .label,
+html[data-theme="light"] .qcat,
+html[data-theme="light"] .field label,
+html[data-theme="light"] .filter label,
+html[data-theme="light"] .progress-row,
+html[data-theme="light"] .legend,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .top-sub{
+  color:var(--theme-muted)!important;
+}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] .filter select,
+html[data-theme="light"] .filter input,
+html[data-theme="light"] .dashboard-filter-group select,
+html[data-theme="light"] .pend-edit textarea{
+  background:#fff!important;
+  color:#17212b!important;
+  border-color:#cbd5df!important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{
+  color:#6b7785!important;
+}
+html[data-theme="light"] table,
+html[data-theme="light"] .mini-table{
+  background:#fff!important;
+  color:#17212b!important;
+}
+html[data-theme="light"] th,
+html[data-theme="light"] .mini-table th{
+  background:#f1f5f9!important;
+  color:#17212b!important;
+  border-color:#d9e3ea!important;
+}
+html[data-theme="light"] td{
+  color:#263442!important;
+  border-color:#e1e7ed!important;
+}
+html[data-theme="light"] tr:hover td{
+  background:#f8fafc!important;
+}
+html[data-theme="light"] .choices button{
+  background:#fff!important;
+  color:#263442!important;
+  border-color:#cbd5df!important;
+}
+/* CORES DOS BOTÕES SELECIONADOS NO TEMA CLARO */
+html[data-theme="light"] .choices button.sel-A{
+  background:#dcfce7!important;
+  border-color:#86efac!important;
+  color:#166534!important;
+  box-shadow:0 0 0 2px rgba(34,197,94,.12)!important;
+}
+html[data-theme="light"] .choices button.sel-P{
+  background:#fef3c7!important;
+  border-color:#fcd34d!important;
+  color:#92400e!important;
+  box-shadow:0 0 0 2px rgba(245,158,11,.12)!important;
+}
+html[data-theme="light"] .choices button.sel-N{
+  background:#fee2e2!important;
+  border-color:#fca5a5!important;
+  color:#991b1b!important;
+  box-shadow:0 0 0 2px rgba(239,68,68,.12)!important;
+}
+html[data-theme="light"] .choices button.sel-NA{
+  background:#e0e7ff!important;
+  border-color:#a5b4fc!important;
+  color:#3730a3!important;
+  box-shadow:0 0 0 2px rgba(99,102,241,.12)!important;
+}
+html[data-theme="light"] .secondary{
+  background:#fff!important;
+  color:#1769aa!important;
+  border-color:#1769aa!important;
+}
+html[data-theme="light"] .danger{
+  background:#fff!important;
+  color:#c53030!important;
+  border-color:#e7b0b0!important;
+}
+html[data-theme="light"] .notice{
+  color:#1e3a8a!important;
+}
+html[data-theme="light"] .tablewrap{
+  border-color:#d9e3ea!important;
+}
+html[data-theme="light"] .modal-head,
+html[data-theme="light"] .modal-foot{
+  border-color:#d9e3ea!important;
+}
+html[data-theme="light"] .modal-head button{
+  color:#334155!important;
+}
+/* ===== CORREÇÃO DO KPI AUDITORIAS NO TEMA CLARO ===== */
+html[data-theme="light"] .kpi:first-child{
+  background:#fff!important;
+  color:#17212b!important;
+  border-color:#d8e3ea!important;
+}
+html[data-theme="light"] .kpi:first-child .caption{
+  color:#526273!important;
+}
+html[data-theme="light"] .kpi:first-child .num{
+  color:#17212b!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+
+/* O menu lateral continua escuro, mas todo o conteúdo principal fica com texto escuro. */
+html[data-theme="light"] .sidebar,
+html[data-theme="light"] .side-nav,
+html[data-theme="light"] aside{
+  color:#fff!important;
+}
+/* Gráficos desenhados em canvas usam estas cores quando o tema é claro. */
+html[data-theme="light"] canvas{
+  color:#334155;
+}
