@@ -309,9 +309,10 @@ function setAlertAuditor(enc){alertAuditorFilter=decodeURIComponent(enc);renderS
 function renderScheduleAlerts(){
   const el=document.getElementById("scheduleAlerts"); if(!el) return;
   const ym=document.getElementById("schedMonth")?.value, planta=document.getElementById("schedPlanta")?.value||"all";
-  if(!ym){el.innerHTML="";return;}
+  if(!ym){el.innerHTML="";setAlertBadge(0,0);return;}
   const al=getScheduleAlerts(ym,planta);
-  if(!al.has){el.innerHTML="";return;}
+  if(!al.has){el.innerHTML="";setAlertBadge(0,0);return;}
+  setAlertBadge(al.late.length+al.week.length,al.late.length);
   const fmt=iso=>iso.slice(8,10)+"/"+iso.slice(5,7);
   const auds=[...new Set([...al.late,...al.week].map(x=>x.auditor))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
   if(alertAuditorFilter!=="all" && !auds.includes(alertAuditorFilter)) alertAuditorFilter="all";
@@ -373,6 +374,7 @@ function saveMoveAssignment(){
   saveState(); closeMoveAssignment(); renderSchedule(); renderScheduleAlerts();
 }
 function startAuditFromSchedule(colaboradorEnc,auditorEnc,dueDateEnc){
+  closeAlertDrawer();
   const colaborador=decodeURIComponent(colaboradorEnc), auditor=decodeURIComponent(auditorEnc);
   const dueDate=dueDateEnc?decodeURIComponent(dueDateEnc):"";
   activeScheduleDueDate=dueDate;
@@ -385,3 +387,86 @@ function startAuditFromSchedule(colaboradorEnc,auditorEnc,dueDateEnc){
   document.getElementById("fAuditor").value=auditor;
   document.getElementById("fData").value=new Date().toISOString().slice(0,10);
 }
+
+/* ===== REFAZER MANTENDO O QUE JÁ FOI AUDITADO =====
+   Quem já tem auditoria registrada no mês fica fixo (auditor e semana reais do histórico).
+   Só os pendentes são reprogramados, em semanas que ainda não terminaram, equilibrando a carga dos auditores. */
+function onRebuildKeepingDone(){
+  const ym=document.getElementById("schedMonth").value;
+  if(!ym){alert("Selecione o m\u00eas.");return;}
+  const key=scheduleKey(ym,"all");
+  const norm=n=>String(n||"").trim().toLowerCase();
+  const weeks=monthWeeks(ym).map(w=>({start:w.start.toISOString().slice(0,10),end:w.end.toISOString().slice(0,10)}));
+  const now=new Date();
+  let avail=[]; weeks.forEach((w,i)=>{if(new Date(w.end+"T23:59:59")>=now)avail.push(i);});
+  if(!avail.length) avail=[weeks.length-1];
+  const assignments=[]; let kept=0, redone=0;
+  for(const planta of ["FUNDI\u00c7\u00c3O","USINAGEM"]){
+    const collabs=(state.collaborators||[]).filter(c=>normalizePlantName(c.planta)===planta).map(c=>c.name);
+    const auditors=(state.auditors||[]).map(a=>a.name).filter(Boolean).filter(a=>auditorAllowedForPlant(a,planta));
+    if(!collabs.length) continue;
+    const load={}; auditors.forEach(a=>{load[a]=0;});
+    const pending=[];
+    collabs.forEach(c=>{
+      const recs=(state.records||[]).filter(r=>norm(r.colaborador)===norm(c)&&String(r.data||"").slice(0,7)===ym)
+        .sort((x,y)=>String(y.data).localeCompare(String(x.data)));
+      if(!recs.length){pending.push(c);return;}
+      const r=recs[0], d=String(r.data).slice(0,10);
+      let wi=weeks.findIndex(w=>d>=w.start&&d<=w.end); if(wi<0)wi=weeks.length-1;
+      const aud=String(r.auditor||"").trim()||"\u2014";
+      assignments.push({weekIdx:wi,auditor:aud,colaborador:c,planta,done:true});
+      load[aud]=(load[aud]||0)+1; kept++;
+    });
+    if(pending.length&&auditors.length){
+      const hist=buildPairHistory(ym,planta);
+      const cnt={};
+      assignments.filter(a=>normalizePlantName(a.planta)===planta).forEach(a=>{const k=a.auditor+"|"+a.weekIdx;cnt[k]=(cnt[k]||0)+1;});
+      shuffleArray(pending).forEach(c=>{
+        const minL=Math.min(...auditors.map(a=>load[a]||0));
+        const lo=auditors.filter(a=>(load[a]||0)===minL);
+        const minC=Math.min(...lo.map(a=>hist.cost(c,a)));
+        const aud=pickRandom(lo.filter(a=>hist.cost(c,a)===minC));
+        const minW=Math.min(...avail.map(w=>cnt[aud+"|"+w]||0));
+        const wi=avail.find(w=>(cnt[aud+"|"+w]||0)===minW);
+        assignments.push({weekIdx:wi,auditor:aud,colaborador:c,planta});
+        load[aud]=(load[aud]||0)+1; cnt[aud+"|"+wi]=(cnt[aud+"|"+wi]||0)+1; redone++;
+      });
+    }
+  }
+  if(!confirm("Refazer a programa\u00e7\u00e3o de "+ym.split("-").reverse().join("/")+" mantendo quem j\u00e1 foi auditado?\n\n"+kept+" auditada(s) ser\u00e3o mantidas com o auditor e a semana reais do hist\u00f3rico.\n"+redone+" pendente(s) ser\u00e3o reprogramadas nas semanas que ainda n\u00e3o terminaram.\n\nAjustes manuais dos pendentes ser\u00e3o perdidos. Uma c\u00f3pia da programa\u00e7\u00e3o atual fica guardada neste aparelho.")) return;
+  if(state.schedule[key]){
+    try{localStorage.setItem("auditoria_programacao_anterior",JSON.stringify({key,savedAt:new Date().toISOString(),schedule:state.schedule[key]}));}catch(e){}
+  }
+  takeSnapshot("antes de refazer a programa\u00e7\u00e3o mantendo auditadas",true);
+  state.schedule[key]={ym,plantaFilter:"all",weeks,assignments,generatedAt:new Date().toISOString(),rebuiltKeepingDone:true};
+  saveState(); renderSchedule();
+}
+
+/* ===== ABA LATERAL: situação da programação ===== */
+function setAlertBadge(n,late){
+  const b=document.getElementById("alertTabBadge"), t=document.getElementById("alertTab");
+  if(b) b.textContent=n;
+  if(t) t.classList.toggle("has-late",late>0);
+}
+function openAlertDrawer(){
+  document.getElementById("alertDrawer")?.classList.add("open");
+  document.getElementById("alertDrawer")?.setAttribute("aria-hidden","false");
+  document.getElementById("alertOverlay")?.classList.add("open");
+}
+function closeAlertDrawer(){
+  document.getElementById("alertDrawer")?.classList.remove("open");
+  document.getElementById("alertDrawer")?.setAttribute("aria-hidden","true");
+  document.getElementById("alertOverlay")?.classList.remove("open");
+}
+function toggleAlertDrawer(){
+  if(document.getElementById("alertDrawer")?.classList.contains("open")) closeAlertDrawer(); else openAlertDrawer();
+}
+(function(){
+  const baseNav=nav;
+  nav=function(page){
+    closeAlertDrawer();
+    baseNav.apply(this,arguments);
+    document.getElementById("alertTab")?.classList.toggle("show",page==="programacao");
+  };
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAlertDrawer();});
+})();
