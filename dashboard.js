@@ -1,6 +1,10 @@
 /* ============================================================
    Dashboard e gráficos
    ============================================================ */
+/* ---- Áreas de "hover" dos gráficos (tooltip e clique para filtrar) ---- */
+var CHART_HITS={};
+function hit(id,x,y,w,h,t,f){(CHART_HITS[id]||(CHART_HITS[id]=[])).push({x:x,y:y,w:w,h:h,t:t,f:f});}
+function arcHit(id,cx,cy,r0,r1,a0,a1,t){(CHART_HITS[id]||(CHART_HITS[id]=[])).push({arc:true,cx:cx,cy:cy,r0:r0,r1:r1,a0:a0,a1:a1,t:t});}
 function allItems(){
  const arr=[]; state.records.forEach(r=>getQuestionsForRecord(r).forEach(q=>{const v=r.answers?.[q.code]; if(v==="N"||v==="P")arr.push({r,q,v,just:r.justificativas?.[q.code]||""});})); return arr;
 }
@@ -100,11 +104,11 @@ function renderDashboard(){
  });
  document.getElementById("catBars").innerHTML=bars||'<div class="empty">Sem dados para o filtro.</div>';
 
- const c=document.getElementById("resultChart"),ctx=c.getContext("2d"),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+ const c=document.getElementById("resultChart"),ctx=c.getContext("2d"),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);CHART_HITS.resultChart=[];c.__unit=1;
  ctx.fillStyle=chartTextColor();ctx.font="bold 15px Arial";ctx.textAlign="center";ctx.fillText("Distribui\u00e7\u00e3o das respostas",w/2,18);
  const data=[["A",A,"#70ad47",pctConf],["P",P,"#ffc000",pctParcial],["N",N,"#c00000",pctNaoConf]],max=Math.max(1,...data.map(x=>x[1]));
  const bw=Math.min(110,(w-180)/3),gap=45,start=(w-(bw*3+gap*2))/2;
- data.forEach((d,i)=>{let x=start+i*(bw+gap),bh=(d[1]/max)*170;ctx.fillStyle=d[2];ctx.fillRect(x,h-45-bh,bw,bh);ctx.fillStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#ffffff":"#333";ctx.font="bold 15px Arial";ctx.textAlign="center";ctx.fillText(d[1]+" ("+d[3].toLocaleString("pt-BR")+"%)",x+bw/2,h-58-bh);ctx.fillText(d[0],x+bw/2,h-20);});
+ data.forEach((d,i)=>{let x=start+i*(bw+gap),bh=(d[1]/max)*170;ctx.fillStyle=d[2];ctx.fillRect(x,h-45-bh,bw,bh);hit("resultChart",x,h-70-bh,bw,bh+70,d[0]+": "+d[1]+" resposta(s) \u2022 "+d[3].toLocaleString("pt-BR")+"%");ctx.fillStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#ffffff":"#333";ctx.font="bold 15px Arial";ctx.textAlign="center";ctx.fillText(d[1]+" ("+d[3].toLocaleString("pt-BR")+"%)",x+bw/2,h-58-bh);ctx.fillText(d[0],x+bw/2,h-20);});
 
  const localMap={};
  rec.forEach(r=>{localMap[r.local]??={aud:0,a:0,p:0,n:0};localMap[r.local].aud++;Object.values(r.answers||{}).forEach(v=>{if(v==="A")localMap[r.local].a++;if(v==="P")localMap[r.local].p++;if(v==="N")localMap[r.local].n++;});});
@@ -130,7 +134,7 @@ function prepareChartCanvas(id, fallbackH){
  const cssW=Math.max(320,Math.round(rect.width||c.parentElement?.clientWidth||700));
  const cssH=Math.max(220,Math.round(rect.height||fallbackH||300));
  const dpr=Math.max(1,Math.min(window.devicePixelRatio||1,3));
- c.width=Math.round(cssW*dpr); c.height=Math.round(cssH*dpr);
+ c.width=Math.round(cssW*dpr); c.height=Math.round(cssH*dpr); c.__unit=dpr; CHART_HITS[id]=[];
  const ctx=c.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
  return {c,ctx,w:cssW,h:cssH};
 }
@@ -156,7 +160,7 @@ function drawHBars(id,data){
   ctx.fillStyle=chartTextColor();ctx.textAlign="right";
   let label=String(d[0]); if(label.length>25)label=label.slice(0,24)+"\u2026"; ctx.fillText(label,padL-10,cy);
   const bw=Math.max(3,(d[1]/max)*plotW);
-  ctx.fillStyle=d[2]||"#4472c4"; ctx.fillRect(padL,cy-bh/2,bw,bh);
+  ctx.fillStyle=d[2]||"#4472c4"; ctx.fillRect(padL,cy-bh/2,bw,bh); hit(id,0,cy-rowH/2,w,rowH,String(d[0])+": "+d[1]+(id==="worstSectorChart"?" n\u00e3o conformidade(s)":id==="auditorChart"?" auditoria(s)":""),id==="worstSectorChart"?["dashSetor",String(d[0])]:id==="auditorChart"?["dashAuditor",String(d[0])]:null);
   ctx.fillStyle=chartTextColor();ctx.textAlign="left";ctx.font="bold 12px Arial";ctx.fillText(String(d[1]),padL+bw+8,cy);ctx.font="11px Arial";
  });
 }
@@ -170,7 +174,7 @@ function drawLineTrend(id,points,color){
  const stepX=points.length>1?plotW/(points.length-1):0;
  ctx.strokeStyle=color||"#1769aa";ctx.lineWidth=3;ctx.lineJoin="round";ctx.lineCap="round";ctx.beginPath();
  points.forEach((p,i)=>{const x=padL+stepX*i,y=padT+plotH-(p[1]/100)*plotH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
- points.forEach((p,i)=>{const x=padL+stepX*i,y=padT+plotH-(p[1]/100)*plotH;ctx.fillStyle=color||"#1769aa";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(p[1]+"%",x,y-11);});
+ points.forEach((p,i)=>{const x=padL+stepX*i,y=padT+plotH-(p[1]/100)*plotH;ctx.fillStyle=color||"#1769aa";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(p[1]+"%",x,y-11);hit(id,x-14,0,28,h,"Semana de "+p[0]+": "+p[1]+"% de conformidade");});
  ctx.fillStyle=chartTextColor();ctx.font="10px Arial";ctx.textAlign="center";
  points.forEach((p,i)=>{if(points.length<=10||i%Math.ceil(points.length/10)===0||i===points.length-1){const x=padL+stepX*i;ctx.fillText(p[0],x,h-12);}});
 }
@@ -234,7 +238,7 @@ function drawMonthlyGeneralChart(id,points){
  [0,25,50,75,100].forEach(v=>{const y=padT+plotH-(v/100)*plotH;ctx.strokeStyle=chartGridColor();ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();ctx.fillStyle=chartTextColor();ctx.font="10px Arial";ctx.textAlign="right";ctx.textBaseline="middle";ctx.fillText(v+"%",padL-7,y);});
  const step=points.length>1?plotW/(points.length-1):0;ctx.strokeStyle="#4472c4";ctx.lineWidth=3;ctx.lineJoin="round";ctx.lineCap="round";ctx.beginPath();
  points.forEach((p,i)=>{const x=padL+step*i,y=padT+plotH-(p[1]/100)*plotH;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
- points.forEach((p,i)=>{const x=padL+step*i,y=padT+plotH-(p[1]/100)*plotH;ctx.fillStyle="#4472c4";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(p[1]+"%",x,y-11);ctx.font="10px Arial";ctx.fillText(p[0],x,h-12);});
+ points.forEach((p,i)=>{const x=padL+step*i,y=padT+plotH-(p[1]/100)*plotH;ctx.fillStyle="#4472c4";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(p[1]+"%",x,y-11);ctx.font="10px Arial";ctx.fillText(p[0],x,h-12);hit(id,x-20,0,40,h,p[0]+": "+p[1]+"% (m\u00e9dia geral)");});
 }
 function renderQuestionMonthChart(rec){
  const z=prepareChartCanvas("questionMonthChart",760); if(!z)return;
@@ -282,6 +286,7 @@ function renderQuestionMonthChart(rec){
    months.forEach((m,ci)=>{
      const cell=vals[q.code][m]; const pct=cell.n?cell.sum/cell.n: null;
      const x=padL+ci*colW;
+     hit("questionMonthChart",x,y,colW,rowH,q.code+" \u2014 "+String(q.text||"")+" \u2022 "+m.slice(5)+"/"+m.slice(2,4)+": "+(pct===null?"sem respostas":Math.round(pct)+"% ("+cell.n+" resp.)"));
      ctx.strokeStyle=grid;ctx.lineWidth=1;ctx.strokeRect(x,y,colW,rowH);
      if(pct===null){ctx.fillStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#1e293b":"#f1f5f9";ctx.fillRect(x+1,y+1,Math.max(0,colW-2),Math.max(0,rowH-2));}
      else {
@@ -336,7 +341,7 @@ function drawCollabScoreBars(id,data){
    ctx.fillStyle=chartTextColor();ctx.textAlign="right";
    let label=String(name);if(label.length>27)label=label.slice(0,26)+"\u2026";ctx.fillText(label,padL-10,cy);
    const bw=Math.max(3,(avg/100)*plotW);
-   ctx.fillStyle=avg>=80?"#70ad47":avg>=60?"#ffc000":"#c00000";ctx.fillRect(padL,cy-bh/2,bw,bh);
+   ctx.fillStyle=avg>=80?"#70ad47":avg>=60?"#ffc000":"#c00000";ctx.fillRect(padL,cy-bh/2,bw,bh);hit(id,0,cy-rowH/2,w,rowH,String(name)+": "+avg.toLocaleString("pt-BR")+"% \u2022 "+v.auditorias+" auditoria(s)");
    ctx.fillStyle=chartTextColor();ctx.textAlign="left";ctx.font="bold 12px Arial";ctx.fillText(avg.toLocaleString("pt-BR")+"%",padL+bw+8,cy-5);
    ctx.font="10px Arial";ctx.fillText(v.auditorias+" auditorias",padL+bw+8,cy+10);
    ctx.font="11px Arial";
@@ -353,6 +358,7 @@ function drawDonut(id,data,opts){
  data.forEach(d=>{
   const slice=(d[1]/total)*Math.PI*2;
   ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,rOuter,ang,ang+slice);ctx.closePath();ctx.fillStyle=d[2];ctx.fill();
+  arcHit(id,cx,cy,rInner,rOuter,ang,ang+slice,d[0]+": "+d[1]+" ("+Math.round(d[1]/total*100)+"%)");
   ang+=slice;
  });
  ctx.globalCompositeOperation="destination-out";ctx.beginPath();ctx.arc(cx,cy,rInner,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation="source-over";
@@ -392,7 +398,7 @@ function renderParetoChart(rec){
  const y80=padT+plotH-(80/100)*plotH;ctx.setLineDash([5,4]);ctx.strokeStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#94a3b8":"#94a3b8";ctx.beginPath();ctx.moveTo(padL,y80);ctx.lineTo(w-padR,y80);ctx.stroke();ctx.setLineDash([]);
  ctx.fillStyle=document.documentElement.getAttribute("data-theme")==="dark"?"#cbd5e1":"#64748b";ctx.font="10px Arial";ctx.textAlign="left";ctx.fillText("80%",w-padR+8,y80);
  let cum=0; const pts=[];
- items.forEach((it,i)=>{const x=padL+gap+i*(bw+gap);const bh=(it[1]/max)*plotH;const y=padT+plotH-bh;ctx.fillStyle="#c00000";ctx.fillRect(x,y,bw,bh);ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(String(it[1]),x+bw/2,y-7);ctx.save();ctx.translate(x+bw/2,h-padB+12);ctx.rotate(-Math.PI/4);ctx.font="10px Arial";ctx.fillText(it[0],0,0);ctx.restore();cum+=it[1];pts.push([x+bw/2,padT+plotH-(cum/total)*plotH,cum/total*100]);});
+ items.forEach((it,i)=>{const x=padL+gap+i*(bw+gap);const bh=(it[1]/max)*plotH;const y=padT+plotH-bh;ctx.fillStyle="#c00000";ctx.fillRect(x,y,bw,bh);hit("paretoChart",x-gap/2,padT,bw+gap,plotH,it[0]+" \u2014 "+(((questions.find(q=>q.code===it[0])||{}).text)||"")+": "+it[1]+" n\u00e3o conformidade(s)");ctx.fillStyle=chartTextColor();ctx.font="bold 10px Arial";ctx.textAlign="center";ctx.fillText(String(it[1]),x+bw/2,y-7);ctx.save();ctx.translate(x+bw/2,h-padB+12);ctx.rotate(-Math.PI/4);ctx.font="10px Arial";ctx.fillText(it[0],0,0);ctx.restore();cum+=it[1];pts.push([x+bw/2,padT+plotH-(cum/total)*plotH,cum/total*100]);});
  // eixo direito 0–100%
  ctx.fillStyle=chartTextColor();ctx.font="10px Arial";ctx.textAlign="left";ctx.textBaseline="middle";[0,25,50,75,100].forEach(v=>{const y=padT+plotH-(v/100)*plotH;ctx.fillText(v+"%",w-padR+8,y);});
  ctx.strokeStyle="#4472c4";ctx.lineWidth=3;ctx.lineJoin="round";ctx.lineCap="round";ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
