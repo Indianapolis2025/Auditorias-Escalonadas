@@ -103,6 +103,7 @@ function saveAudit(){
  const rec={id:"WEB-"+Date.now(),local,setor:s.setor||"",planta,questionSet:planta,colaborador:document.getElementById("fColaborador").value.trim(),auditor,data,situacao,programadaPara:dueDate||"",dataRealizacao:completionDate,answers:{},justificativas:{},acoesTomadas:{},notaPercentual:0};
  qs.forEach(q=>{rec.answers[q.code]=formAnswers[q.code]; const t=document.getElementById("txt-"+q.code).value.trim(); if(t)rec.justificativas[q.code]=t;});
  rec.notaPercentual=calcAuditScorePercent(rec);
- state.records.push(rec); saveState(); activeScheduleDueDate=""; alert(situacao==="ATRASADA" ? "Auditoria salva como ATRASADA. O dashboard ir\u00e1 contabiliz\u00e1-la como auditoria atrasada." : "Auditoria salva com sucesso."); location.reload();
+ state.records.push(rec); saveState(); activeScheduleDueDate=""; alert(situacao==="ATRASADA" ? "Auditoria salva como ATRASADA. O dashboard ir\u00e1 contabiliz\u00e1-la como auditoria atrasada." : "Auditoria salva com sucesso.");
+ Promise.resolve(onlineReady?syncStateOnlineNow():null).catch(e=>console.warn("sync",e)).then(()=>location.reload());
 }
 function refreshLocalOptions(){const loc=document.getElementById("fLocal");if(!loc)return;const cur=loc.value;loc.innerHTML='<option value="">Selecione...</option>';[...state.sectors].sort((a,b)=>a.local.localeCompare(b.local)).forEach(x=>{const o=document.createElement("option");o.value=x.local;o.textContent=`${x.local} \u2014 ${x.setor}`;loc.appendChild(o)});if([...loc.options].some(o=>o.value===cur))loc.value=cur;}

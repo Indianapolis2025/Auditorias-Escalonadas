@@ -216,7 +216,7 @@ function svgCats(cur,prev){
   return s+'</svg>';
 }
 function svgTrend(points){
-  const W=560,H=170,pl=36,pr=14,pt=14,pb=26,pw=W-pl-pr,ph=H-pt-pb;
+  const W=560,H=170,pl=40,pr=30,pt=18,pb=26,pw=W-pl-pr,ph=H-pt-pb;
   let s='<svg width="100%" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Arial">';
   [0,50,100].forEach(v=>{const y=pt+ph-v/100*ph;s+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'" stroke="#dbe3ea"/><text x="'+(pl-5)+'" y="'+(y+3)+'" font-size="9" text-anchor="end" fill="#64748b">'+v+'%</text>';});
   const step=points.length>1?pw/(points.length-1):0; let path="";
@@ -225,34 +225,103 @@ function svgTrend(points){
   points.forEach(function(p,i){if(p[1]===null)return;const x=pl+step*i,y=pt+ph-p[1]/100*ph;s+='<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="#1769aa"/><text x="'+x+'" y="'+(y-8)+'" font-size="9" font-weight="700" text-anchor="middle" fill="#17333a">'+Math.round(p[1])+'%</text>';});
   return s+'</svg>';
 }
+function rCard(title,inner,obs){return '<div class="card"><h2>'+title+'</h2><div class="cb">'+inner+'</div>'+(obs?'<p class="obs"><b>Análise:</b> '+obs+'</p>':'')+'</div>';}
+function rTable(head,rows,numCols){
+  if(!rows.length)return '<div class="empty">Sem dados.</div>';
+  return '<table><thead><tr>'+head.map((x,i)=>'<th'+(numCols.includes(i)?' class="n"':'')+'>'+x+'</th>').join("")+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((x,i)=>'<td'+(numCols.includes(i)?' class="n"':'')+'>'+x+'</td>').join("")+'</tr>').join("")+'</tbody></table>';
+}
+function obsCats(cur,prev,pl){
+  const cs=cur.cats.filter(c=>c.pct!==null); if(!cs.length)return "";
+  const sorted=cs.slice().sort((a,b)=>b.pct-a.pct), P=[];
+  P.push("A categoria com melhor resultado foi <b>"+esc(sorted[0].name)+"</b> ("+Math.round(sorted[0].pct)+"%) e a mais fraca foi <b>"+esc(sorted[sorted.length-1].name)+"</b> ("+Math.round(sorted[sorted.length-1].pct)+"%).");
+  const low=cs.filter(c=>c.pct<70); if(low.length)P.push("Abaixo de 70%: "+low.map(c=>esc(c.name)+" ("+Math.round(c.pct)+"%)").join(", ")+" — exigem plano de ação.");
+  else P.push("Nenhuma categoria ficou abaixo de 70%.");
+  if(prev){
+    const dl=[];cur.cats.forEach((c,i)=>{const p=prev.cats[i];if(c.pct!==null&&p&&p.pct!==null)dl.push({n:c.name,d:c.pct-p.pct});});
+    if(dl.length){dl.sort((a,b)=>b.d-a.d);const up=dl[0],dn=dl[dl.length-1];
+      if(up.d>=1)P.push("Maior evolução frente a "+pl+": <b>"+esc(up.n)+"</b> (+"+Math.round(up.d)+" p.p.).");
+      if(dn.d<=-1)P.push("Maior queda: <b>"+esc(dn.n)+"</b> ("+Math.round(dn.d)+" p.p.).");}
+  }
+  return P.join(" ");
+}
+function obsTrend(trend){
+  const v=trend.filter(t=>t[1]!==null);
+  if(v.length<2)return "Há dados em apenas um mês; a evolução será exibida conforme novos meses forem registrados.";
+  const f=v[0],l=v[v.length-1],d=Math.round((l[1]-f[1])*10)/10;
+  const mx=v.reduce((a,b)=>b[1]>a[1]?b:a),mn=v.reduce((a,b)=>b[1]<a[1]?b:a);
+  return "Entre "+f[0]+" e "+l[0]+" a nota geral "+(d>0?"subiu":d<0?"caiu":"se manteve")+(d!==0?" <b>"+Math.abs(d).toLocaleString("pt-BR")+" p.p.</b>":"")+" ("+fmtPct(f[1])+" → "+fmtPct(l[1])+"). Melhor mês: "+mx[0]+" ("+fmtPct(mx[1])+"); pior mês: "+mn[0]+" ("+fmtPct(mn[1])+").";
+}
+function obsPareto(cur){
+  if(!cur.topQ.length||!cur.N)return cur.N?"":"Não houve respostas N (não conforme) no mês.";
+  const sN=cur.topQ.reduce((n,q)=>n+q.N,0),q=cur.topQ[0];
+  return "Os "+cur.topQ.length+" itens listados somam <b>"+sN+" de "+cur.N+"</b> não conformidades ("+Math.round(sN/cur.N*100)+"%). O item <b>"+esc(q.code)+"</b> é o mais crítico ("+q.N+" N e "+q.P+" P); concentrar a ação corretiva nele traz o maior retorno.";
+}
+function obsSectors(cur){
+  const s=cur.sectors.filter(x=>x.N>0); if(!s.length||!cur.N)return "Nenhum setor registrou não conformidade.";
+  return "<b>"+esc(s[0].name)+"</b> concentra "+s[0].N+" de "+cur.N+" não conformidades do mês ("+Math.round(s[0].N/cur.N*100)+"%)."+(s.length>1?" Em seguida: "+esc(s[1].name)+" ("+s[1].N+").":"");
+}
+function obsCollabs(cur){
+  const c=cur.collabs; if(!c.length)return "";
+  const m=c.reduce((n,x)=>n+x.avg,0)/c.length, low=c.filter(x=>x.avg<70);
+  return "Média dos colaboradores: <b>"+fmtPct(m)+"</b>; maior nota "+esc(c[0].name)+" ("+Math.round(c[0].avg)+"%) e menor "+esc(c[c.length-1].name)+" ("+Math.round(c[c.length-1].avg)+"%). "+(low.length?low.length+" colaborador(es) abaixo de 70%: acompanhar de perto.":"Todos os colaboradores auditados ficaram com nota igual ou acima de 70%.");
+}
+function obsAuditors(cur){
+  const a=cur.auditors; if(!a.length)return "";
+  const mx=a[0],mn=a[a.length-1];
+  return "Foram realizadas <b>"+cur.n+"</b> auditorias por "+a.length+" auditor(es)."+(a.length>1&&mx.n>=2*mn.n?" Há desequilíbrio: "+esc(mx.name)+" fez "+mx.n+" e "+esc(mn.name)+" fez "+mn.n+".":" A distribuição entre os auditores está equilibrada.");
+}
+function obsPend(cur){
+  if(!cur.pend.length)return "Nenhum item N ou P no mês, portanto não há pendências.";
+  const r=Math.round(cur.pendDone/cur.pend.length*100);
+  return "<b>"+r+"%</b> das ocorrências N/P já têm justificativa e ação registradas."+(cur.pendOpen?" Restam <b>"+cur.pendOpen+"</b> para o líder do setor tratar em Pendências.":" Todas foram tratadas.");
+}
+function obsProg(prog){
+  if(!prog)return "Gere a programação do mês na aba Programação para acompanhar o cumprimento.";
+  const p=Math.round(prog.done/prog.total*100);
+  return "Cumprimento de <b>"+p+"%</b> ("+prog.done+" de "+prog.total+")."+(prog.pend.length?" Faltam "+prog.pend.length+" colaborador(es) a auditar; priorizar os das semanas já encerradas.":" Programação concluída.");
+}
 function plantReportHTML(ym,plant,first){
-  const pym=prevYm(ym);
+  const pym=prevYm(ym), pl=ymLabel(pym);
   const cur=analyze(recsForReport(plant,ym),plant), prev=analyze(recsForReport(plant,pym),plant);
-  const hasPrev=prev.n>0, ins=buildInsights(cur,hasPrev?prev:null,ymLabel(pym));
+  const hasPrev=prev.n>0, ins=buildInsights(cur,hasPrev?prev:null,pl);
   const prog=progStatusFor(plant,ym);
-  if(prog) ins.push({i:"📅",tone:prog.done<prog.total?"bad":"good",t:"Programação: <b>"+prog.done+" de "+prog.total+"</b> auditorias realizadas ("+Math.round(prog.done/prog.total*100)+"%)."});
-  const trend=[];let k=ym;const ks=[];for(let i=0;i<6;i++){ks.unshift(k);k=prevYm(k);}
-  ks.forEach(x=>{const a=analyze(recsForReport(plant,x),plant);trend.push([monthLabelPt(x).slice(0,3)+"/"+x.slice(2,4),a.nota]);});
-  const dnota=hasPrev&&cur.nota!==null&&prev.nota!==null?Math.round((cur.nota-prev.nota)*10)/10:null;
-  const kpi=(l,v,c)=>'<div class="kpi '+(c||"")+'"><div class="kl">'+l+'</div><div class="kv">'+v+'</div></div>';
+  if(prog&&cur.n) ins.push({i:"📅",tone:prog.done<prog.total?"bad":"good",t:"Programação: <b>"+prog.done+" de "+prog.total+"</b> auditorias realizadas ("+Math.round(prog.done/prog.total*100)+"%)."});
   let h='<section class="plant'+(first?"":" brk")+'"><div class="head"><div><div class="brand">AUDITORIAS ESCALONADAS — RELATÓRIO MENSAL</div><div class="sub">Planta '+plant+' • FQ100</div></div><div class="period">'+ymLabel(ym)+'</div></div>';
   if(TEST_MONTHS.includes(ym)) h+='<div class="testnote">⚠ Mês em fase de teste do programa: os resultados podem ser ajustados ou descartados.</div>';
-  if(!cur.n) return h+'<div class="empty">Nenhuma auditoria registrada nesta planta no mês.</div></section>';
+  const progCard=rCard("Cumprimento da programação",prog?'<div class="mini">Realizadas: <b>'+prog.done+' de '+prog.total+'</b> ('+Math.round(prog.done/prog.total*100)+'%)</div>'+(prog.pend.length?rTable(["Colaborador sem auditoria","Auditor programado","Semana"],prog.pend.map(p=>[esc(p.colaborador),esc(p.auditor),p.week?fmtShort(new Date(p.week.start+"T00:00:00"))+" – "+fmtShort(new Date(p.week.end+"T00:00:00")):"—"]),[]):'<div class="empty">Todos os colaboradores programados foram auditados. ✅</div>'):'<div class="empty">Não há programação gerada para este mês.</div>',obsProg(prog));
+  if(!cur.n) return h+'<div class="card"><div class="cb"><b>Nenhuma auditoria registrada em '+plant+' em '+ymLabel(ym)+'.</b><br><span class="mini">'+(hasPrev?'No mês anterior ('+pl+') foram '+prev.n+' auditoria(s), com nota geral de '+fmtPct(prev.nota)+'.':'Não há auditorias no mês anterior para comparação.')+'</span></div></div>'+progCard+'<div class="foot">Gerado em '+new Date().toLocaleString("pt-BR")+'</div></section>';
+  const dnota=hasPrev&&cur.nota!==null&&prev.nota!==null?Math.round((cur.nota-prev.nota)*10)/10:null;
+  const kpi=(l,v,c)=>'<div class="kpi '+(c||"")+'"><div class="kl">'+l+'</div><div class="kv">'+v+'</div></div>';
+  const trend=[];let k=ym;const ks=[];for(let i=0;i<6;i++){ks.unshift(k);k=prevYm(k);}
+  ks.forEach(x=>{const a=analyze(recsForReport(plant,x),plant);trend.push([monthLabelPt(x).slice(0,3)+"/"+x.slice(2,4),a.nota]);});
   h+='<div class="kpis">'+kpi("Auditorias",cur.n)+kpi("Respostas válidas",cur.valid)+kpi("Nota geral",fmtPct(cur.nota)+(dnota!==null?'<small class="'+(dnota>0?"up":dnota<0?"down":"")+'">'+(dnota>0?"▲ +":dnota<0?"▼ ":"= ")+dnota.toLocaleString("pt-BR")+' p.p.</small>':""),"blue")+kpi("Conforme (A)",fmtPct(cur.valid?cur.A/cur.valid*100:null),"green")+kpi("Parcial (P)",fmtPct(cur.valid?cur.P/cur.valid*100:null),"yellow")+kpi("Não conforme (N)",fmtPct(cur.valid?cur.N/cur.valid*100:null),"red")+kpi("Pendências abertas",cur.pendOpen,"orange")+'</div>';
-  h+='<div class="card"><h2>Análise do mês</h2><ul class="ins">'+ins.map(x=>'<li class="'+(x.tone||"")+'"><span>'+x.i+'</span><div>'+x.t+'</div></li>').join("")+'</ul></div>';
-  h+='<div class="card"><h2>Conformidade por categoria <small>(barra = mês atual; traço = '+ymLabel(pym)+')</small></h2>'+svgCats(cur,hasPrev?prev:null)+'</div>';
-  h+='<div class="card"><h2>Evolução da nota geral — últimos 6 meses</h2>'+svgTrend(trend)+'</div>';
-  h+='<div class="two"><div class="card"><h2>Itens mais críticos (Pareto)</h2>'+(cur.topQ.length?'<table><thead><tr><th>Item</th><th class="n">N</th><th class="n">P</th></tr></thead><tbody>'+cur.topQ.map(q=>'<tr><td><b>'+esc(q.code)+'</b> — '+esc(q.text)+'</td><td class="n">'+q.N+'</td><td class="n">'+q.P+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">Nenhum item com N ou P.</div>')+'</div>';
+  h+='<div class="card"><h2>Resumo da análise</h2><ul class="ins">'+ins.map(x=>'<li class="'+(x.tone||"")+'"><span>'+x.i+'</span><div>'+x.t+'</div></li>').join("")+'</ul></div>';
+  h+=rCard('Conformidade por categoria <small>(barra = mês atual; traço = '+pl+')</small>',svgCats(cur,hasPrev?prev:null),obsCats(cur,hasPrev?prev:null,pl));
+  h+=rCard("Evolução da nota geral — últimos 6 meses",svgTrend(trend),obsTrend(trend));
+  h+='<div class="two">'+rCard("Itens mais críticos (Pareto)",rTable(["Item","N","P"],cur.topQ.map(q=>["<b>"+esc(q.code)+"</b> — "+esc(q.text),q.N,q.P]),[1,2]),obsPareto(cur));
   const secs=cur.sectors.filter(s=>s.N>0).slice(0,5);
-  h+='<div class="card"><h2>Setores com mais não conformidades</h2>'+(secs.length?'<table><thead><tr><th>Setor</th><th class="n">Aud.</th><th class="n">N</th><th class="n">Nota</th></tr></thead><tbody>'+secs.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="n">'+s.n+'</td><td class="n">'+s.N+'</td><td class="n">'+Math.round(s.avg)+'%</td></tr>').join("")+'</tbody></table>':'<div class="empty">Nenhuma não conformidade.</div>')+'</div></div>';
-  const best=cur.collabs.slice(0,5), worst=cur.collabs.slice().reverse().slice(0,5);
-  const crow=a=>a.map(c=>'<tr><td>'+esc(c.name)+'</td><td class="n">'+c.n+'</td><td class="n"><b>'+Math.round(c.avg)+'%</b></td></tr>').join("");
-  h+='<div class="two"><div class="card"><h2>Colaboradores — maiores notas</h2><table><thead><tr><th>Colaborador</th><th class="n">Aud.</th><th class="n">Nota</th></tr></thead><tbody>'+crow(best)+'</tbody></table></div><div class="card"><h2>Colaboradores — pontos de atenção</h2><table><thead><tr><th>Colaborador</th><th class="n">Aud.</th><th class="n">Nota</th></tr></thead><tbody>'+crow(worst)+'</tbody></table></div></div>';
-  h+='<div class="two"><div class="card"><h2>Auditorias por auditor</h2><table><thead><tr><th>Auditor</th><th class="n">Aud.</th><th class="n">Nota média</th></tr></thead><tbody>'+cur.auditors.map(a=>'<tr><td>'+esc(a.name)+'</td><td class="n">'+a.n+'</td><td class="n">'+Math.round(a.avg)+'%</td></tr>').join("")+'</tbody></table></div>';
+  h+=rCard("Setores com mais não conformidades",rTable(["Setor","Aud.","N","Nota"],secs.map(s=>[esc(s.name),s.n,s.N,Math.round(s.avg)+"%"]),[1,2,3]),obsSectors(cur))+'</div>';
+  const crow=a=>a.map(c=>[esc(c.name),c.n,"<b>"+Math.round(c.avg)+"%</b>"]);
+  h+='<div class="two">'+rCard("Colaboradores — maiores notas",rTable(["Colaborador","Aud.","Nota"],crow(cur.collabs.slice(0,5)),[1,2]),obsCollabs(cur))+rCard("Colaboradores — pontos de atenção",rTable(["Colaborador","Aud.","Nota"],crow(cur.collabs.slice().reverse().slice(0,5)),[1,2]),"")+'</div>';
   const open=cur.pend.filter(p=>p.open);
-  h+='<div class="card"><h2>Pendências e ações</h2><div class="mini">Total de N/P: <b>'+cur.pend.length+'</b> • Resolvidas: <b>'+cur.pendDone+'</b> • Abertas: <b>'+cur.pendOpen+'</b></div>'+(open.length?'<table><thead><tr><th>Data</th><th>Local</th><th>Item</th><th>Status</th></tr></thead><tbody>'+open.slice(0,10).map(p=>'<tr><td>'+fmtDate(p.data)+'</td><td>'+esc(p.local)+'</td><td>'+esc(p.code)+' ('+p.v+')</td><td>'+esc(p.status)+'</td></tr>').join("")+'</tbody></table>'+(open.length>10?'<div class="mini">+ '+(open.length-10)+' pendência(s) não listada(s).</div>':""):'<div class="empty">Sem pendências abertas.</div>')+'</div></div>';
-  h+='<div class="card"><h2>Cumprimento da programação</h2>'+(prog?'<div class="mini">Realizadas: <b>'+prog.done+' de '+prog.total+'</b> ('+Math.round(prog.done/prog.total*100)+'%)</div>'+(prog.pend.length?'<table><thead><tr><th>Colaborador sem auditoria</th><th>Auditor programado</th><th>Semana</th></tr></thead><tbody>'+prog.pend.map(p=>'<tr><td>'+esc(p.colaborador)+'</td><td>'+esc(p.auditor)+'</td><td>'+(p.week?fmtShort(new Date(p.week.start+"T00:00:00"))+" – "+fmtShort(new Date(p.week.end+"T00:00:00")):"—")+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">Todos os colaboradores programados foram auditados. ✅</div>'):'<div class="empty">Não há programação gerada para este mês.</div>')+'</div>';
+  h+='<div class="two">'+rCard("Auditorias por auditor",rTable(["Auditor","Aud.","Nota média"],cur.auditors.map(a=>[esc(a.name),a.n,Math.round(a.avg)+"%"]),[1,2]),obsAuditors(cur));
+  h+=rCard("Pendências e ações",'<div class="mini">Total de N/P: <b>'+cur.pend.length+'</b> • Resolvidas: <b>'+cur.pendDone+'</b> • Abertas: <b>'+cur.pendOpen+'</b></div>'+(open.length?rTable(["Data","Local","Item","Status"],open.slice(0,10).map(p=>[fmtDate(p.data),esc(p.local),esc(p.code)+" ("+p.v+")",esc(p.status)]),[])+(open.length>10?'<div class="mini">+ '+(open.length-10)+' pendência(s) não listada(s).</div>':""):'<div class="empty">Sem pendências abertas.</div>'),obsPend(cur))+'</div>';
+  h+=progCard;
   return h+'<div class="foot">Gerado em '+new Date().toLocaleString("pt-BR")+' • N.A. não entra no cálculo • A = 100%, P = 50%, N = 0%</div></section>';
+}
+function summaryHTML(ym,plants){
+  const pl=ymLabel(prevYm(ym));
+  const rows=plants.map(function(p){
+    const c=analyze(recsForReport(p,ym),p), q=analyze(recsForReport(p,prevYm(ym)),p), pr=progStatusFor(p,ym);
+    const d=c.nota!==null&&q.nota!==null?Math.round((c.nota-q.nota)*10)/10:null;
+    return {p:p,c:c,d:d,pr:pr,row:[ "<b>"+p+"</b>",c.n,fmtPct(c.nota),d===null?"—":(d>0?"▲ +":d<0?"▼ ":"= ")+d.toLocaleString("pt-BR")+" p.p.",fmtPct(c.valid?c.A/c.valid*100:null),fmtPct(c.valid?c.P/c.valid*100:null),fmtPct(c.valid?c.N/c.valid*100:null),c.pendOpen,pr?pr.done+"/"+pr.total:"—"]};
+  });
+  const withData=rows.filter(r=>r.c.n>0), without=rows.filter(r=>!r.c.n);
+  let obs=withData.length?"":"Nenhuma planta registrou auditorias no mês.";
+  if(withData.length>1){const s=withData.slice().sort((a,b)=>b.c.nota-a.c.nota);obs="A planta com melhor nota foi <b>"+s[0].p+"</b> ("+fmtPct(s[0].c.nota)+"), "+Math.round((s[0].c.nota-s[s.length-1].c.nota)*10)/10+" p.p. acima de "+s[s.length-1].p+" ("+fmtPct(s[s.length-1].c.nota)+").";}
+  else if(withData.length===1) obs="Somente <b>"+withData[0].p+"</b> registrou auditorias no mês.";
+  if(without.length) obs+=" Sem auditorias no mês: <b>"+without.map(r=>r.p).join(", ")+"</b>.";
+  return '<section class="plant"><div class="head"><div><div class="brand">AUDITORIAS ESCALONADAS — RELATÓRIO MENSAL</div><div class="sub">Resumo das plantas • FQ100</div></div><div class="period">'+ymLabel(ym)+'</div></div>'+(TEST_MONTHS.includes(ym)?'<div class="testnote">⚠ Mês em fase de teste do programa: os resultados podem ser ajustados ou descartados.</div>':'')+rCard("Comparativo entre plantas (variação frente a "+pl+")",rTable(["Planta","Aud.","Nota geral","Variação","A","P","N","Pend. abertas","Programação"],rows.map(r=>r.row),[1,2,3,4,5,6,7,8]),obs)+'</section>';
 }
 function recsForReport(plant,ym){
   return (state.records||[]).filter(r=>inferPlant(r)===plant&&String(r.data||"").slice(0,7)===ym);
@@ -263,8 +332,11 @@ function generateMonthlyReport(){
   document.getElementById("repModal")?.remove();
   const w=window.open("","_blank","width=1100,height=900");
   if(!w){alert("Permita pop-ups para gerar o relatório mensal.");return;}
-  const body=plants.map((p,i)=>plantReportHTML(ym,p,i===0)).join("");
-  const css='@page{size:A4 portrait;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#17333a;margin:0;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.brk{break-before:page;page-break-before:always}.head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #f26a00;padding-bottom:6px;margin-bottom:8px}.brand{font-size:16px;font-weight:900}.sub{font-size:10px;color:#68787b;margin-top:2px}.period{font-size:15px;font-weight:800;color:#f26a00}.testnote{background:#fff3cd;border:1px solid #f0c24b;color:#5c4400;padding:6px 9px;border-radius:5px;margin-bottom:8px;font-weight:700}.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}.kpi{border:1px solid #cfdad8;border-left:4px solid #94a3b8;border-radius:5px;padding:5px 7px}.kpi.blue{border-left-color:#1769aa}.kpi.green{border-left-color:#2e9e5b}.kpi.yellow{border-left-color:#f0a81c}.kpi.red{border-left-color:#d64545}.kpi.orange{border-left-color:#f26a00}.kl{font-size:8px;font-weight:700;text-transform:uppercase;color:#52666a}.kv{font-size:16px;font-weight:900;margin-top:2px}.kv small{display:block;font-size:9px;font-weight:700}.up{color:#1a7f45}.down{color:#c0392b}.card{border:1px solid #cfdad8;border-radius:6px;margin-bottom:8px;break-inside:avoid;overflow:hidden}.card h2{font-size:11px;margin:0;padding:5px 8px;background:#eef3f2;border-bottom:2px solid #f26a00}.card h2 small{font-weight:400;color:#68787b}.card>*:not(h2){margin:6px 8px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e3eaea;padding:3px 4px;text-align:left;font-size:10px}th{background:#f6f9f9}.n{text-align:right;width:44px}.ins{list-style:none;padding:0;margin:4px 8px 6px}.ins li{display:flex;gap:7px;padding:3px 0;border-bottom:1px dashed #e3eaea;line-height:1.35}.ins li.bad{color:#8a1f12}.ins li.good{color:#14532d}.mini{font-size:10px;color:#52666a}.empty{color:#68787b;font-style:italic}.foot{font-size:9px;color:#68787b;text-align:right;margin-top:4px}';
+  let body;
+  try{
+    body=(plants.length>1?summaryHTML(ym,plants):"")+plants.map((p,i)=>plantReportHTML(ym,p,i===0)).join("");
+  }catch(e){w.close();console.error(e);alert("Não foi possível gerar o relatório: "+e.message);return;}
+  const css='@page{size:A4 portrait;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#17333a;margin:0;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.brk{break-before:page;page-break-before:always}.head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #f26a00;padding-bottom:6px;margin-bottom:8px}.brand{font-size:16px;font-weight:900}.sub{font-size:10px;color:#68787b;margin-top:2px}.period{font-size:15px;font-weight:800;color:#f26a00}.testnote{background:#fff3cd;border:1px solid #f0c24b;color:#5c4400;padding:6px 9px;border-radius:5px;margin-bottom:8px;font-weight:700}.kpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:8px}.kpi{border:1px solid #cfdad8;border-left:4px solid #94a3b8;border-radius:5px;padding:5px 6px;min-width:0}.kpi.blue{border-left-color:#1769aa}.kpi.green{border-left-color:#2e9e5b}.kpi.yellow{border-left-color:#f0a81c}.kpi.red{border-left-color:#d64545}.kpi.orange{border-left-color:#f26a00}.kl{font-size:8px;font-weight:700;text-transform:uppercase;color:#52666a;line-height:1.2}.kv{font-size:15px;font-weight:900;margin-top:2px}.kv small{display:block;font-size:9px;font-weight:700}.up{color:#1a7f45}.down{color:#c0392b}.card{border:1px solid #cfdad8;border-radius:6px;margin-bottom:8px;break-inside:avoid;page-break-inside:avoid;overflow:hidden;min-width:0}.card h2{font-size:11px;margin:0;padding:5px 8px;background:#eef3f2;border-bottom:2px solid #f26a00}.card h2 small{font-weight:400;color:#68787b}.cb{padding:6px 8px}.obs{margin:0;padding:6px 8px;background:#f7faf9;border-top:1px solid #e3eaea;font-size:10px;line-height:1.45;color:#2b4247}.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:start}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e3eaea;padding:3px 4px;text-align:left;font-size:10px;vertical-align:top}th{background:#f6f9f9}.n{text-align:right;white-space:nowrap}.ins{list-style:none;padding:0;margin:4px 8px 6px}.ins li{display:flex;gap:7px;padding:3px 0;border-bottom:1px dashed #e3eaea;line-height:1.35}.ins li.bad{color:#8a1f12}.ins li.good{color:#14532d}.mini{font-size:10px;color:#52666a;margin-bottom:4px}.empty{color:#68787b;font-style:italic}.foot{font-size:9px;color:#68787b;text-align:right;margin-top:4px}svg{display:block;max-width:100%}.plant{margin-bottom:12px}';
   w.document.open();
   w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório mensal — '+ymLabel(ym)+'</title><style>'+css+'</style></head><body>'+body+'<script>window.addEventListener("load",function(){setTimeout(function(){window.focus();window.print();},600);});<\/script></body></html>');
   w.document.close();

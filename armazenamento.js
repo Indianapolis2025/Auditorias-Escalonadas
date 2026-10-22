@@ -48,7 +48,8 @@ function setActiveQuestionSet(plant){
 }
 function saveState(){
   state.auditorRules={...AUDITOR_PLANT_RULES};
-  localStorage.setItem(KEY, JSON.stringify(state));
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e){ if(!window.__quotaAvisado){ window.__quotaAvisado=true; alert("Aten\u00e7\u00e3o: o navegador n\u00e3o conseguiu salvar os dados neste aparelho (espa\u00e7o cheio). Exporte um Backup (JSON) agora e libere espa\u00e7o."); } console.error("saveState",e); }
   queueOnlineSync();
 }
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}

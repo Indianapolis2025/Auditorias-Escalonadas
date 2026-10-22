@@ -3,7 +3,7 @@
    do sistema, um por vez e na ordem certa.
    ============================================================ */
 (function(){
-  var V="20261021-5"; // aumente este valor ao publicar uma nova versao (evita cache antigo)
+  var V="20261021-6"; // aumente este valor ao publicar uma nova versao (evita cache antigo)
   var SCRIPTS=["online","armazenamento","backup","acesso","navegacao","auditoria","dashboard","pendencias","historico","cadastros","programacao","relatorios","exportacao","dashextra","gerencial","tema","estado","inicio"];
   var DADOS=["perguntas-usinagem","perguntas-fundicao","locais","historico-inicial","colaboradores","auditores","firebase-config","perguntas-gerencial","gestores"];
 

@@ -409,7 +409,7 @@ function clearAllRecords(){
  if(!state.records.length){alert("N\u00e3o h\u00e1 registros para apagar.");return;}
  if(!confirm(`Isso vai apagar TODAS as ${state.records.length} auditorias do hist\u00f3rico deste navegador. Essa a\u00e7\u00e3o n\u00e3o pode ser desfeita.\n\nRecomendado: exporte um Backup (JSON) antes, caso ainda n\u00e3o tenha.\n\nDeseja continuar?`))return;
  if(!confirm("Confirmar definitivamente a exclus\u00e3o de TODO o hist\u00f3rico?"))return;
- takeSnapshot("antes de apagar o hist\u00f3rico",true); state.records=[]; saveState(); alert("Hist\u00f3rico apagado."); location.reload();
+ takeSnapshot("antes de apagar o hist\u00f3rico",true); state.records=[]; saveState(); alert("Hist\u00f3rico apagado."); Promise.resolve(onlineReady?syncStateOnlineNow():null).catch(e=>console.warn("sync",e)).then(()=>location.reload());
 }
 function setDashLocal(local){document.getElementById("dashLocal").value=local;renderDashboard();}
 function exportDashboardPDF(){
